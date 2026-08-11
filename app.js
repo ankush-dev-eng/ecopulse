@@ -1,340 +1,360 @@
-// --- Constants & Config ---
-const EMISSION_RATES = {
-    'air': 0.602,
-    'truck': 0.096,
-    'electric-truck': 0.025,
-    'rail': 0.028,
-    'ship': 0.016
-};
+document.addEventListener('DOMContentLoaded', () => {
+    initParticles();
+    initTypewriter();
+    initScrollEffects();
+    initCharts();
+    initCalculator();
+    initAI();
+    initExport();
+    
+    document.getElementById('year').textContent = new Date().getFullYear();
+    document.getElementById('report-date').textContent += new Date().toLocaleDateString();
+});
 
-// Simplified distance matrix (km)
-const DISTANCES = {
-    'New York-London': 5567,
-    'London-Tokyo': 9559,
-    'Shanghai-Rotterdam': 8920,
-    'Dubai-Singapore': 5840,
-    'Hamburg-Los Angeles': 9060,
-    'Mumbai-New York': 12540,
-    'Tokyo-Shanghai': 1760,
-    'Los Angeles-Tokyo': 8800,
-    'Rotterdam-Dubai': 5170,
-    'Singapore-Mumbai': 3900
-};
+// Particle System
+function initParticles() {
+    const canvas = document.getElementById('particle-canvas');
+    const ctx = canvas.getContext('2d');
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
 
-// --- DOM Elements ---
-const weightSlider = document.getElementById('weight');
-const weightVal = document.getElementById('weight-val');
-const modeCards = document.querySelectorAll('.mode-card');
-const calcBtn = document.getElementById('calc-btn');
-const calcSpinner = document.getElementById('calc-spinner');
-const resultsCard = document.getElementById('results-card');
-const originSel = document.getElementById('origin');
-const destSel = document.getElementById('destination');
-
-let selectedMode = 'air';
-let selectedRate = EMISSION_RATES['air'];
-
-// --- Particles Background ---
-function createParticles() {
-    const container = document.getElementById('particles');
-    for (let i = 0; i < 30; i++) {
-        const particle = document.createElement('div');
-        particle.className = 'particle';
-        particle.style.left = Math.random() * 100 + 'vw';
-        particle.style.top = Math.random() * 100 + 'vh';
-        particle.style.animationDuration = (Math.random() * 5 + 3) + 's';
-        particle.style.animationDelay = (Math.random() * 2) + 's';
-        container.appendChild(particle);
+    const particles = [];
+    for(let i=0; i<50; i++){
+        particles.push({
+            x: Math.random() * canvas.width,
+            y: Math.random() * canvas.height,
+            size: Math.random() * 3 + 1,
+            speedY: Math.random() * -1 - 0.5,
+            speedX: Math.random() * 1 - 0.5,
+            opacity: Math.random() * 0.5 + 0.1
+        });
     }
-}
-createParticles();
 
-// --- Event Listeners ---
-weightSlider.addEventListener('input', (e) => {
-    weightVal.textContent = e.target.value;
-});
-
-modeCards.forEach(card => {
-    card.addEventListener('click', () => {
-        modeCards.forEach(c => c.classList.remove('active'));
-        card.classList.add('active');
-        selectedMode = card.dataset.mode;
-        selectedRate = parseFloat(card.dataset.rate);
-    });
-});
-
-calcBtn.addEventListener('click', calculateFootprint);
-
-// --- Calculation Logic ---
-function getDistance(origin, dest) {
-    const key1 = `${origin}-${dest}`;
-    const key2 = `${dest}-${origin}`;
-    return DISTANCES[key1] || DISTANCES[key2] || Math.floor(Math.random() * 5000 + 1000); // fallback
+    function animate() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = '#00e676';
+        
+        particles.forEach(p => {
+            p.y += p.speedY;
+            p.x += Math.sin(p.y * 0.01) + p.speedX;
+            if(p.y < 0) {
+                p.y = canvas.height;
+                p.x = Math.random() * canvas.width;
+            }
+            ctx.globalAlpha = p.opacity;
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+            ctx.fill();
+        });
+        requestAnimationFrame(animate);
+    }
+    animate();
 }
 
-function getRating(co2PerKg) {
-    if (co2PerKg < 0.05) return { grade: 'A+', color: 'var(--accent-emerald)', border: 'var(--accent-emerald)' };
-    if (co2PerKg < 0.1) return { grade: 'B', color: 'var(--accent-lime)', border: 'var(--accent-lime)' };
-    if (co2PerKg < 0.2) return { grade: 'C', color: '#ffd54f', border: '#ffd54f' };
-    if (co2PerKg < 0.5) return { grade: 'D', color: '#ffb74d', border: '#ffb74d' };
-    return { grade: 'F', color: 'var(--danger-red)', border: 'var(--danger-red)' };
+// Typewriter
+function initTypewriter() {
+    const text = "Track, optimize, and report your carbon footprint.";
+    const el = document.getElementById('typewriter');
+    let i = 0;
+    function type() {
+        if(i < text.length) {
+            el.innerHTML += text.charAt(i);
+            i++;
+            setTimeout(type, 50);
+        }
+    }
+    setTimeout(type, 500);
 }
 
-function calculateFootprint() {
-    const origin = originSel.value;
-    const dest = destSel.value;
-    const weightKg = parseFloat(weightSlider.value);
-    
-    // Simulate loading
-    calcSpinner.classList.remove('hidden');
-    resultsCard.classList.add('hidden');
-    
-    setTimeout(() => {
-        const distanceKm = getDistance(origin, dest);
-        const weightTon = weightKg / 1000;
-        
-        // Math
-        const totalCo2 = weightTon * distanceKm * selectedRate;
-        const energyKwh = totalCo2 * 2.5; // arbitrary conversion for UI
-        const cost = weightKg * 0.5 + distanceKm * 0.1; // arbitrary
-        
-        const co2PerKg = totalCo2 / weightKg;
-        const rating = getRating(co2PerKg);
-        
-        // Update UI
-        document.getElementById('res-co2').textContent = totalCo2.toFixed(1);
-        document.getElementById('res-energy').textContent = energyKwh.toFixed(1);
-        document.getElementById('res-cost').textContent = cost.toFixed(2);
-        
-        const ratingEl = document.getElementById('res-rating');
-        const ratingBox = document.getElementById('rating-box');
-        ratingEl.textContent = rating.grade;
-        ratingEl.style.color = rating.color;
-        ratingBox.style.borderColor = rating.border;
-        
-        calcSpinner.classList.add('hidden');
-        resultsCard.classList.remove('hidden');
-        
-        // Generate AI Suggestion based on result
-        generateAISuggestion(origin, dest, selectedMode, totalCo2);
-        
-    }, 800);
-}
+// Scroll Effects & Intersection Observer
+function initScrollEffects() {
+    const navbar = document.getElementById('navbar');
+    const backToTop = document.getElementById('back-to-top');
+    const sections = document.querySelectorAll('section');
+    const navLinks = document.querySelectorAll('.nav-links a');
 
-// --- Animated Counters ---
-const counters = document.querySelectorAll('.counter');
-const speed = 200;
-counters.forEach(counter => {
-    const updateCount = () => {
-        const target = +counter.getAttribute('data-target');
-        const count = +counter.innerText;
-        const inc = target / speed;
-        if (count < target) {
-            counter.innerText = Math.ceil(count + inc);
-            setTimeout(updateCount, 10);
+    window.addEventListener('scroll', () => {
+        if(window.scrollY > 50) {
+            navbar.classList.add('scrolled');
+            backToTop.classList.add('visible');
         } else {
-            counter.innerText = target.toLocaleString();
+            navbar.classList.remove('scrolled');
+            backToTop.classList.remove('visible');
         }
-    };
-    
-    // Intersection Observer to start animation when visible
-    const observer = new IntersectionObserver((entries) => {
-        if(entries[0].isIntersecting) {
-            updateCount();
-            observer.disconnect();
-        }
-    });
-    observer.observe(counter);
-});
 
-// --- Chart.js ---
-window.addEventListener('DOMContentLoaded', () => {
-    Chart.defaults.color = '#adb5bd';
-    Chart.defaults.font.family = "'Inter', sans-serif";
+        let current = '';
+        sections.forEach(section => {
+            const sectionTop = section.offsetTop;
+            if(scrollY >= sectionTop - 200) current = section.getAttribute('id');
+        });
+
+        navLinks.forEach(a => {
+            a.classList.remove('active');
+            if(a.getAttribute('href').includes(current)) a.classList.add('active');
+        });
+    });
+
+    backToTop.addEventListener('click', () => window.scrollTo({top:0, behavior:'smooth'}));
+
+    const observer = new IntersectionObserver(entries => {
+        entries.forEach(entry => {
+            if(entry.isIntersecting) {
+                entry.target.classList.add('visible');
+                if(entry.target.id === 'dashboard') animateCounters();
+            }
+        });
+    }, { threshold: 0.1 });
+
+    sections.forEach(sec => observer.observe(sec));
+}
+
+// Animated Counters
+let countersAnimated = false;
+function animateCounters() {
+    if(countersAnimated) return;
+    countersAnimated = true;
     
-    // Bar Chart
-    const ctxBar = document.getElementById('barChart').getContext('2d');
-    new Chart(ctxBar, {
+    const counters = [
+        { id: 'stat-saved', target: 4520 },
+        { id: 'stat-shipments', target: 128 },
+        { id: 'stat-money', target: 12500 }
+    ];
+
+    counters.forEach(c => {
+        const el = document.getElementById(c.id);
+        let count = 0;
+        const inc = c.target / 100;
+        const interval = setInterval(() => {
+            count += inc;
+            if(count >= c.target) {
+                el.innerText = c.target.toLocaleString();
+                clearInterval(interval);
+            } else {
+                el.innerText = Math.floor(count).toLocaleString();
+            }
+        }, 20);
+    });
+}
+
+// Calculator
+const factors = { air: 0.602, truck: 0.096, ev: 0.025, rail: 0.028, ship: 0.016 };
+let compChart;
+
+function initCalculator() {
+    const weightSlider = document.getElementById('weight');
+    const weightVal = document.getElementById('weight-val');
+    const modeCards = document.querySelectorAll('.mode-card');
+    let currentMode = 'air';
+
+    weightSlider.addEventListener('input', e => weightVal.textContent = e.target.value);
+
+    modeCards.forEach(card => {
+        card.addEventListener('click', () => {
+            modeCards.forEach(c => c.classList.remove('active'));
+            card.classList.add('active');
+            currentMode = card.dataset.mode;
+            
+            const icons = { air: 'fa-plane', ship: 'fa-ship', rail: 'fa-train', truck: 'fa-truck', ev: 'fa-truck-fast' };
+            const vIcon = document.getElementById('vehicle-icon');
+            vIcon.className = `fas ${icons[currentMode]} route-vehicle`;
+        });
+    });
+
+    document.getElementById('calc-btn').addEventListener('click', () => {
+        createRipple(event);
+        const distance = 5567; // Mock fixed distance for demo
+        const weight = document.getElementById('weight').value;
+        const co2 = (distance * weight * factors[currentMode]).toFixed(0);
+        
+        // Animate result
+        const totalEl = document.getElementById('total-co2');
+        totalEl.innerHTML = `${co2} <small>kg CO₂</small>`;
+        
+        // Rating
+        const maxCo2 = distance * weight * factors.air;
+        const ratio = co2 / maxCo2;
+        let rating = 'A', color = 'var(--primary)';
+        if(ratio > 0.8) { rating = 'F'; color = 'var(--danger)'; }
+        else if(ratio > 0.5) { rating = 'D'; color = 'var(--danger)'; }
+        else if(ratio > 0.2) { rating = 'C'; color = 'var(--amber)'; }
+        else if(ratio > 0.1) { rating = 'B'; color = 'var(--accent)'; }
+        
+        const circle = document.getElementById('rating-circle');
+        document.getElementById('rating-text').textContent = rating;
+        document.getElementById('rating-text').style.color = color;
+        circle.style.background = `conic-gradient(${color} ${100 - (ratio*100)}%, rgba(255,255,255,0.1) 0%)`;
+
+        updateCompChart(distance, weight);
+        showToast('Calculation complete!', 'success');
+    });
+}
+
+function updateCompChart(dist, weight) {
+    const ctx = document.getElementById('comparisonChart').getContext('2d');
+    const data = Object.values(factors).map(f => dist * weight * f);
+    
+    if(compChart) compChart.destroy();
+    
+    compChart = new Chart(ctx, {
         type: 'bar',
         data: {
-            labels: ['Air', 'Truck', 'Rail', 'Ship', 'E-Truck'],
+            labels: ['Air', 'Truck', 'EV', 'Rail', 'Ship'],
             datasets: [{
-                label: 'CO₂ per ton-km (kg)',
-                data: [0.602, 0.096, 0.028, 0.016, 0.025],
-                backgroundColor: [
-                    'rgba(255, 61, 0, 0.7)',
-                    'rgba(255, 183, 77, 0.7)',
-                    'rgba(118, 255, 3, 0.7)',
-                    'rgba(0, 191, 165, 0.7)',
-                    'rgba(0, 230, 118, 0.7)'
-                ],
-                borderRadius: 6
+                label: 'kg CO₂',
+                data: data,
+                backgroundColor: ['#ff5252', '#ffc107', '#00e676', '#00bcd4', '#00bcd4'],
+                borderRadius: 4
             }]
         },
         options: {
             responsive: true,
-            maintainAspectRatio: false,
-            plugins: { legend: { display: false }, title: { display: true, text: 'Emissions by Transport Mode' } }
+            plugins: { legend: { display: false } },
+            scales: { y: { display: false }, x: { grid: { display: false }, ticks: { color: '#fff' } } }
         }
     });
+}
 
-    // Doughnut Chart
-    const ctxDoughnut = document.getElementById('doughnutChart').getContext('2d');
-    new Chart(ctxDoughnut, {
-        type: 'doughnut',
-        data: {
-            labels: ['Renewable', 'Fossil Fuels'],
-            datasets: [{
-                data: [45, 55],
-                backgroundColor: ['#00e676', '#ffb74d'],
-                borderWidth: 0
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            cutout: '75%',
-            plugins: { title: { display: true, text: 'Fleet Energy Source' } }
-        }
-    });
+// Charts
+function initCharts() {
+    Chart.defaults.color = '#fff';
+    Chart.defaults.font.family = 'Inter';
 
-    // Line Chart
-    const ctxLine = document.getElementById('lineChart').getContext('2d');
-    const gradLine = ctxLine.createLinearGradient(0, 0, 0, 400);
-    gradLine.addColorStop(0, 'rgba(0, 230, 118, 0.5)');
-    gradLine.addColorStop(1, 'rgba(0, 230, 118, 0.0)');
-
-    new Chart(ctxLine, {
+    new Chart(document.getElementById('trendChart'), {
         type: 'line',
         data: {
-            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
             datasets: [{
-                label: 'Monthly CO₂ Footprint (tons)',
-                data: [120, 115, 110, 105, 95, 90, 85, 88, 75, 70, 65, 50],
+                label: 'Emissions (t)',
+                data: [65, 59, 80, 81, 56, 55],
                 borderColor: '#00e676',
-                backgroundColor: gradLine,
+                backgroundColor: 'rgba(0, 230, 118, 0.2)',
                 fill: true,
                 tension: 0.4
             }]
         },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: { title: { display: true, text: 'Carbon Reduction Trend (2025)' } },
-            scales: { y: { beginAtZero: true } }
-        }
+        options: { responsive: true, maintainAspectRatio: false }
     });
-    
-    // Set report date
-    document.getElementById('report-date').textContent = new Date().toLocaleDateString();
-});
 
-// --- AI Chat ---
-function generateAISuggestion(origin, dest, mode, currentCo2) {
-    const chatBox = document.getElementById('ai-chat');
-    chatBox.innerHTML = ''; // Clear prev
-    
-    const msgs = [];
-    
-    if (mode === 'air') {
-        const saved = (currentCo2 - (currentCo2 * (EMISSION_RATES['ship'] / EMISSION_RATES['air']))).toFixed(1);
-        msgs.push({
-            title: "Switch to Ocean Freight",
-            desc: `Switching from Air to Ship for ${origin} to ${dest} could save ${saved} kg of CO₂ (-97%). Transit time increases by +18 days.`,
-            action: "Apply Mode Change"
-        });
-    } else if (mode === 'truck') {
-        const saved = (currentCo2 - (currentCo2 * (EMISSION_RATES['electric-truck'] / EMISSION_RATES['truck']))).toFixed(1);
-        msgs.push({
-            title: "Use EV Fleet",
-            desc: `An electric truck is available for this route. Switch to save ${saved} kg CO₂ (-74%).`,
-            action: "Switch to E-Truck"
-        });
-    } else {
-        msgs.push({
-            title: "Consolidate Shipments",
-            desc: "You have 3 other shipments heading to the same destination this week. Consolidating them will increase route efficiency by 15%.",
-            action: "Consolidate"
-        });
-    }
-
-    msgs.forEach((msg, i) => {
-        setTimeout(() => {
-            const div = document.createElement('div');
-            div.className = 'chat-msg';
-            div.innerHTML = `
-                <div class="ai-avatar"><i class="fa-solid fa-robot"></i></div>
-                <div class="msg-bubble">
-                    <div class="msg-title">${msg.title}</div>
-                    <p>${msg.desc}</p>
-                    <div class="msg-actions">
-                        <button class="msg-btn btn-accept">${msg.action}</button>
-                        <button class="msg-btn btn-dismiss">Dismiss</button>
-                    </div>
-                </div>
-            `;
-            chatBox.appendChild(div);
-            
-            // Add event listeners to buttons
-            div.querySelector('.btn-dismiss').addEventListener('click', () => div.style.display = 'none');
-            div.querySelector('.btn-accept').addEventListener('click', (e) => {
-                e.target.textContent = 'Applied ✓';
-                e.target.style.background = 'var(--accent-teal)';
-            });
-        }, i * 600);
+    new Chart(document.getElementById('energyChart'), {
+        type: 'doughnut',
+        data: {
+            labels: ['Renewable', 'Fossil'],
+            datasets: [{
+                data: [75, 25],
+                backgroundColor: ['#00e676', '#333'],
+                borderWidth: 0
+            }]
+        },
+        options: { responsive: true, maintainAspectRatio: false }
     });
 }
 
-// Initial dummy chat
-document.addEventListener('DOMContentLoaded', () => {
-    generateAISuggestion('New York', 'London', 'air', 3351);
-});
+// AI Advisor
+function initAI() {
+    document.getElementById('generate-ai-btn').addEventListener('click', function(e) {
+        createRipple(e);
+        const box = document.getElementById('chat-box');
+        
+        // Typing indicator
+        const typingId = 'typing-' + Date.now();
+        box.innerHTML += `
+            <div class="chat-msg" id="${typingId}">
+                <div class="chat-avatar"><i class="fas fa-robot"></i></div>
+                <div class="chat-bubble">...</div>
+            </div>
+        `;
+        box.scrollTop = box.scrollHeight;
 
-// --- Exports ---
-document.getElementById('btn-pdf').addEventListener('click', () => {
-    const { jsPDF } = window.jspdf;
-    const doc = new jsPDF();
-    
-    doc.setFont("helvetica", "bold");
-    doc.setFontSize(22);
-    doc.setTextColor(10, 22, 40);
-    doc.text("EcoPulse ESG Compliance Report", 20, 30);
-    
-    doc.setFontSize(12);
-    doc.setFont("helvetica", "normal");
-    doc.text(`Date: ${new Date().toLocaleDateString()}`, 20, 40);
-    doc.text("Company: Acme Corp Logistics", 20, 48);
-    
-    doc.setLineWidth(0.5);
-    doc.line(20, 55, 190, 55);
-    
-    doc.setFontSize(14);
-    doc.setFont("helvetica", "bold");
-    doc.text("Summary Metrics:", 20, 70);
-    
-    doc.setFont("helvetica", "normal");
-    doc.setFontSize(12);
-    doc.text("- Total CO2 Saved: 15,420 kg", 25, 80);
-    doc.text("- Shipments Optimized: 892", 25, 90);
-    doc.text("- Overall Eco-Rating: A", 25, 100);
-    
-    doc.text("Generated by EcoPulse AI engine.", 20, 280);
-    
-    doc.save("EcoPulse_Report.pdf");
-});
+        setTimeout(() => {
+            document.getElementById(typingId).remove();
+            box.innerHTML += `
+                <div class="chat-msg">
+                    <div class="chat-avatar"><i class="fas fa-robot"></i></div>
+                    <div class="chat-bubble">
+                        Switching your London -> NYC route from Air to Ocean will increase transit time by 12 days but save <strong>4,200 kg CO₂</strong> and reduce costs by 65%.
+                        <div class="ai-actions">
+                            <button class="btn-sm accept" onclick="acceptAI(this)">Accept Change</button>
+                            <button class="btn-sm" onclick="this.parentElement.parentElement.parentElement.remove()">Dismiss</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            box.scrollTop = box.scrollHeight;
+        }, 1500);
+    });
+}
 
-document.getElementById('btn-csv').addEventListener('click', () => {
-    const csvContent = "data:text/csv;charset=utf-8," 
-        + "Date,Metric,Value\n"
-        + `${new Date().toLocaleDateString()},Total CO2 Saved,15420\n`
-        + `${new Date().toLocaleDateString()},Shipments,892\n`
-        + `${new Date().toLocaleDateString()},Rating,A\n`;
-    
-    const encodedUri = encodeURI(csvContent);
-    const link = document.createElement("a");
-    link.setAttribute("href", encodedUri);
-    link.setAttribute("download", "ecopulse_data.csv");
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+window.acceptAI = function(btn) {
+    showToast('Optimization applied successfully!', 'success');
+    btn.parentElement.parentElement.parentElement.remove();
+}
+
+// Utilities
+function showToast(msg) {
+    const container = document.getElementById('toast-container');
+    const toast = document.createElement('div');
+    toast.className = 'toast';
+    toast.innerHTML = `<i class="fas fa-check-circle" style="color: var(--primary)"></i> ${msg}`;
+    container.appendChild(toast);
+    setTimeout(() => toast.remove(), 3000);
+}
+
+function createRipple(event) {
+    const button = event.currentTarget;
+    const circle = document.createElement('span');
+    const diameter = Math.max(button.clientWidth, button.clientHeight);
+    const radius = diameter / 2;
+    circle.style.width = circle.style.height = `${diameter}px`;
+    circle.style.left = `${event.clientX - button.offsetLeft - radius}px`;
+    circle.style.top = `${event.clientY - button.offsetTop - radius}px`;
+    circle.classList.add('ripple');
+    const ripple = button.querySelector('.ripple');
+    if (ripple) ripple.remove();
+    button.appendChild(circle);
+}
+
+// Exports
+function initExport() {
+    document.getElementById('btn-pdf').addEventListener('click', () => {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+        const company = document.getElementById('company-name').value || 'Your Company';
+        
+        doc.setFontSize(22);
+        doc.setTextColor(0, 230, 118);
+        doc.text('EcoPulse ESG Report', 20, 20);
+        
+        doc.setFontSize(14);
+        doc.setTextColor(0, 0, 0);
+        doc.text(`Company: ${company}`, 20, 40);
+        doc.text(`Date: ${new Date().toLocaleDateString()}`, 20, 50);
+        
+        doc.text('Emissions Summary:', 20, 70);
+        doc.text('- Total Scope 3: 12.4t CO2', 30, 80);
+        doc.text('- Overall Grade: B+', 30, 90);
+        
+        doc.save('EcoPulse-Report.pdf');
+        showToast('PDF Downloaded');
+    });
+
+    document.getElementById('btn-csv').addEventListener('click', () => {
+        const csv = "Date,Mode,Origin,Destination,Weight,CO2_kg\n2023-10-01,Air,NYC,LDN,5,1245";
+        const blob = new Blob([csv], { type: 'text/csv' });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.setAttribute('href', url);
+        a.setAttribute('download', 'emissions.csv');
+        a.click();
+        showToast('CSV Exported');
+    });
+}
+
+// Keyboard shortcuts
+document.addEventListener('keydown', (e) => {
+    if(e.key.toLowerCase() === 'c' && e.target.tagName !== 'INPUT') {
+        document.getElementById('simulator').scrollIntoView();
+    }
+    if(e.key.toLowerCase() === 'd' && e.target.tagName !== 'INPUT') {
+        document.getElementById('dashboard').scrollIntoView();
+    }
 });
