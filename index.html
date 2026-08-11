@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EcoPulse - AI-Powered Sustainable Supply Chain</title>
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Outfit:wght@400;500;700;800&display=swap" rel="stylesheet">
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- CSS -->
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="particles" id="particles"></div>
+    
+    <!-- Hero Section -->
+    <section class="hero" id="home">
+        <div class="hero-content">
+            <h1 class="title">Eco<span class="gradient-text">Pulse</span></h1>
+            <p class="tagline">Empowering Sustainable Supply Chains with AI-driven Insights.</p>
+            <a href="#simulator" class="cta-btn">Calculate Your Carbon Footprint</a>
+        </div>
+    </section>
+
+    <div class="container">
+        <!-- Logistics Simulator Section -->
+        <section id="simulator" class="simulator section-glass">
+            <h2 class="section-title">Logistics Simulator</h2>
+            <div class="simulator-grid">
+                <div class="form-group">
+                    <label>Origin City</label>
+                    <select id="origin">
+                        <option value="New York">New York, USA</option>
+                        <option value="London">London, UK</option>
+                        <option value="Tokyo">Tokyo, Japan</option>
+                        <option value="Shanghai">Shanghai, China</option>
+                        <option value="Rotterdam">Rotterdam, Netherlands</option>
+                        <option value="Dubai">Dubai, UAE</option>
+                        <option value="Singapore">Singapore</option>
+                        <option value="Hamburg">Hamburg, Germany</option>
+                        <option value="Los Angeles">Los Angeles, USA</option>
+                        <option value="Mumbai">Mumbai, India</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Destination City</label>
+                    <select id="destination">
+                        <option value="London">London, UK</option>
+                        <option value="New York">New York, USA</option>
+                        <option value="Tokyo">Tokyo, Japan</option>
+                        <option value="Shanghai">Shanghai, China</option>
+                        <option value="Rotterdam">Rotterdam, Netherlands</option>
+                        <option value="Dubai">Dubai, UAE</option>
+                        <option value="Singapore">Singapore</option>
+                        <option value="Hamburg">Hamburg, Germany</option>
+                        <option value="Los Angeles">Los Angeles, USA</option>
+                        <option value="Mumbai">Mumbai, India</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="mode-selector" id="mode-selector">
+                <div class="mode-card active" data-mode="air" data-rate="0.602">
+                    <i class="fa-solid fa-plane"></i>
+                    <span>Air</span>
+                </div>
+                <div class="mode-card" data-mode="truck" data-rate="0.096">
+                    <i class="fa-solid fa-truck"></i>
+                    <span>Truck</span>
+                </div>
+                <div class="mode-card" data-mode="electric-truck" data-rate="0.025">
+                    <i class="fa-solid fa-truck-fast"></i>
+                    <span>E-Truck</span>
+                </div>
+                <div class="mode-card" data-mode="rail" data-rate="0.028">
+                    <i class="fa-solid fa-train"></i>
+                    <span>Rail</span>
+                </div>
+                <div class="mode-card" data-mode="ship" data-rate="0.016">
+                    <i class="fa-solid fa-ship"></i>
+                    <span>Ship</span>
+                </div>
+            </div>
+
+            <div class="weight-slider-container">
+                <label>Cargo Weight: <span id="weight-val">1000</span> kg</label>
+                <input type="range" id="weight" min="1" max="10000" value="1000" class="slider">
+            </div>
+
+            <button id="calc-btn" class="calc-btn">
+                <span>Calculate</span>
+                <i class="fa-solid fa-spinner fa-spin hidden" id="calc-spinner"></i>
+            </button>
+
+            <div class="results-card hidden" id="results-card">
+                <div class="result-item">
+                    <div class="res-label">CO₂ Emissions</div>
+                    <div class="res-val"><span id="res-co2">0</span> kg</div>
+                </div>
+                <div class="result-item">
+                    <div class="res-label">Energy</div>
+                    <div class="res-val"><span id="res-energy">0</span> kWh</div>
+                </div>
+                <div class="result-item">
+                    <div class="res-label">Est. Cost</div>
+                    <div class="res-val">$<span id="res-cost">0</span></div>
+                </div>
+                <div class="result-item rating-box" id="rating-box">
+                    <div class="res-label">Eco-Rating</div>
+                    <div class="res-rating" id="res-rating">A+</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Dashboard Section -->
+        <section id="dashboard" class="dashboard section-glass">
+            <h2 class="section-title">Carbon Dashboard</h2>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <i class="fa-solid fa-leaf"></i>
+                    <div class="stat-info">
+                        <div class="stat-val counter" data-target="15420">0</div>
+                        <div class="stat-label">Total CO₂ Saved (kg)</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <i class="fa-solid fa-box"></i>
+                    <div class="stat-info">
+                        <div class="stat-val counter" data-target="892">0</div>
+                        <div class="stat-label">Shipments Optimized</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <i class="fa-solid fa-route"></i>
+                    <div class="stat-info">
+                        <div class="stat-val counter" data-target="430">0</div>
+                        <div class="stat-label">Green Routes Found</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <i class="fa-solid fa-dollar-sign"></i>
+                    <div class="stat-info">
+                        <div class="stat-val counter" data-target="125500">0</div>
+                        <div class="stat-label">Cost Savings ($)</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="charts-grid">
+                <div class="chart-container">
+                    <canvas id="barChart"></canvas>
+                </div>
+                <div class="chart-container">
+                    <canvas id="doughnutChart"></canvas>
+                </div>
+                <div class="chart-container full-width">
+                    <canvas id="lineChart"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <!-- AI Green Optimizer -->
+        <section id="optimizer" class="optimizer section-glass">
+            <h2 class="section-title">AI Green Optimizer</h2>
+            <div class="chat-interface" id="ai-chat">
+                <!-- Chat messages injected by JS -->
+            </div>
+        </section>
+
+        <!-- ESG Report Section -->
+        <section id="esg-report" class="esg-report section-glass">
+            <h2 class="section-title">ESG Compliance Report</h2>
+            <div class="report-preview">
+                <div class="report-header">
+                    <h3>Acme Corp Logistics</h3>
+                    <p id="report-date">Date</p>
+                </div>
+                <div class="report-body">
+                    <div class="rep-row"><span>Overall Rating:</span> <strong class="text-lime">A</strong></div>
+                    <div class="rep-row"><span>Total Shipments:</span> <strong>892</strong></div>
+                    <div class="rep-row"><span>Avg Emissions/kg:</span> <strong>0.03 kg CO₂</strong></div>
+                </div>
+                <div class="report-actions">
+                    <button class="action-btn" id="btn-pdf"><i class="fa-solid fa-file-pdf"></i> Download PDF</button>
+                    <button class="action-btn outline" id="btn-csv"><i class="fa-solid fa-file-csv"></i> Export CSV</button>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <footer>
+        <div class="footer-content">
+            <p>Made with 🌿 by ankushcseiot-50</p>
+            <div class="tech-stack">
+                <span class="badge"><i class="fa-brands fa-html5"></i> HTML5</span>
+                <span class="badge"><i class="fa-brands fa-css3-alt"></i> CSS3</span>
+                <span class="badge"><i class="fa-brands fa-js"></i> JS</span>
+                <span class="badge"><i class="fa-solid fa-chart-pie"></i> Chart.js</span>
+            </div>
+            <a href="https://github.com/ankushcseiot-50/ecopulse" target="_blank" class="github-link"><i class="fa-brands fa-github"></i> GitHub</a>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
