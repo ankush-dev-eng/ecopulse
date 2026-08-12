@@ -1,20 +1,3 @@
-# Node
 node_modules/
-npm-debug.log
-yarn-error.log
-
-# Mac
+.env
 .DS_Store
-
-# Editor
-.vscode/
-.idea/
-*.suo
-*.ntvs*
-*.njsproj
-*.sln
-*.sw?
-
-# Build
-dist/
-build/

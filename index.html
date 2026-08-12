@@ -3,272 +3,327 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="EcoPulse - AI-Powered Sustainable Supply Chain & Carbon Footprint Calculator">
-    <meta name="theme-color" content="#060d1f">
-    <title>EcoPulse | Green Logistics Intelligence</title>
-    
-    <!-- Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <!-- Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
+    <title>EcoPulse | AI-Powered Sustainable Supply Chain</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Outfit:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
+    <script src="app.js" defer></script>
 </head>
 <body>
-    <div class="aurora-bg"></div>
-    <div class="noise-overlay"></div>
-    <canvas id="particle-canvas" style="position: fixed; top: 0; left: 0; z-index: -1; pointer-events: none;"></canvas>
-
-    <nav class="navbar" id="navbar">
-        <div class="nav-brand">
-            <i class="fas fa-leaf"></i> EcoPulse
+    <div class="background-orbs">
+        <div class="orb orb-emerald"></div>
+        <div class="orb orb-teal"></div>
+        <div class="orb orb-lime"></div>
+    </div>
+    
+    <nav class="navbar sticky">
+        <div class="nav-container">
+            <a href="#" class="logo">
+                <span class="leaf-icon">🌱</span>
+                <span class="logo-text">EcoPulse</span>
+            </a>
+            <div class="nav-links">
+                <a href="#simulator">Simulator</a>
+                <a href="#dashboard">Dashboard</a>
+                <a href="#ai-advisor">AI Advisor</a>
+                <a href="#reports">Reports</a>
+            </div>
+            <div class="nav-actions">
+                <div class="theme-toggle">🌓</div>
+                <div class="user-avatar"></div>
+                <button class="btn btn-pill">Get Started</button>
+            </div>
+            <div class="hamburger">
+                <span></span><span></span><span></span>
+            </div>
         </div>
-        <div class="nav-links">
-            <a href="#hero" class="active">Home</a>
-            <a href="#simulator">Simulator</a>
-            <a href="#dashboard">Dashboard</a>
-            <a href="#ai-advisor">AI Advisor</a>
-            <a href="#report">ESG Report</a>
-        </div>
-        <div class="hamburger" style="display: none;">
-            <i class="fas fa-bars"></i>
-        </div>
+        <div class="animated-border"></div>
     </nav>
 
-    <section id="hero" class="hero">
-        <div class="hero-content">
-            <h1 class="gradient-text">Decarbonize Your<br>Supply Chain</h1>
-            <div class="typewriter-wrapper" id="typewriter"></div>
-            <button class="btn-primary" onclick="document.getElementById('simulator').scrollIntoView()">
-                Start Calculating <i class="fas fa-arrow-right"></i>
-            </button>
-        </div>
-        <div class="scroll-indicator" onclick="document.getElementById('simulator').scrollIntoView()">
-            <i class="fas fa-chevron-down"></i>
-        </div>
-    </section>
-
-    <section id="simulator">
-        <h2 class="section-title"><span class="gradient-text">Route Simulator</span></h2>
-        <div class="simulator-grid">
-            <div class="glass-panel">
-                <h3>Logistics Parameters</h3>
-                <div class="form-group mt-3">
-                    <label>Origin</label>
-                    <select class="form-control" id="origin">
-                        <option value="New York">New York</option>
-                        <option value="London">London</option>
-                        <option value="Shanghai">Shanghai</option>
-                        <option value="Dubai">Dubai</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label>Destination</label>
-                    <select class="form-control" id="destination">
-                        <option value="London">London</option>
-                        <option value="New York">New York</option>
-                        <option value="Tokyo">Tokyo</option>
-                        <option value="Singapore">Singapore</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label>Cargo Weight (Tons): <span id="weight-val">5</span></label>
-                    <input type="range" class="form-control" id="weight" min="1" max="100" value="5">
-                </div>
-                
-                <label>Transport Mode</label>
-                <div class="transport-modes">
-                    <div class="mode-card active" data-mode="air">
-                        <i class="fas fa-plane"></i>
-                        Air
-                    </div>
-                    <div class="mode-card" data-mode="ship">
-                        <i class="fas fa-ship"></i>
-                        Ocean
-                    </div>
-                    <div class="mode-card" data-mode="rail">
-                        <i class="fas fa-train"></i>
-                        Rail
-                    </div>
-                    <div class="mode-card" data-mode="truck">
-                        <i class="fas fa-truck"></i>
-                        Truck
-                    </div>
-                    <div class="mode-card" data-mode="ev">
-                        <i class="fas fa-truck-fast"></i>
-                        EV
-                    </div>
-                </div>
-
-                <div class="route-vis mt-3">
-                    <div id="origin-vis">NYC</div>
-                    <div class="route-line">
-                        <i class="fas fa-plane route-vehicle" id="vehicle-icon"></i>
-                    </div>
-                    <div id="dest-vis">LDN</div>
-                </div>
-                <div class="text-center mt-2 text-muted" id="distance-display">Distance: 5,567 km</div>
-
-                <button class="btn-primary mt-4 w-100" id="calc-btn" style="justify-content: center;">
-                    Calculate Impact
-                </button>
-            </div>
-
-            <div class="glass-panel results-card">
-                <h3>Emissions Result</h3>
-                <div class="eco-rating-display">
-                    <div class="rating-circle" id="rating-circle">
-                        <span id="rating-text">C</span>
-                    </div>
-                    <div>
-                        <h2 id="total-co2">1,245 <small>kg CO₂</small></h2>
-                        <p class="text-muted">Estimated carbon footprint</p>
-                    </div>
-                </div>
-                
-                <div class="mt-4">
-                    <h4>Comparison</h4>
-                    <canvas id="comparisonChart" height="150"></canvas>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <section id="dashboard">
-        <h2 class="section-title"><span class="gradient-text">Analytics Dashboard</span></h2>
-        
-        <div class="stats-grid">
-            <div class="glass-panel stat-card">
-                <div class="stat-icon"><i class="fas fa-leaf"></i></div>
-                <div>
-                    <div class="text-muted">CO₂ Saved (YTD)</div>
-                    <div class="stat-value" id="stat-saved">0</div>
-                </div>
-            </div>
-            <div class="glass-panel stat-card">
-                <div class="stat-icon"><i class="fas fa-box"></i></div>
-                <div>
-                    <div class="text-muted">Shipments</div>
-                    <div class="stat-value" id="stat-shipments">0</div>
-                </div>
-            </div>
-            <div class="glass-panel stat-card">
-                <div class="stat-icon"><i class="fas fa-dollar-sign"></i></div>
-                <div>
-                    <div class="text-muted">Cost Savings</div>
-                    <div class="stat-value">$<span id="stat-money">0</span></div>
-                </div>
-            </div>
-            <div class="glass-panel stat-card">
-                <div class="stat-icon"><i class="fas fa-star"></i></div>
-                <div>
-                    <div class="text-muted">Green Score</div>
-                    <div class="stat-value">85%</div>
-                </div>
-            </div>
-        </div>
-
-        <div class="charts-grid">
-            <div class="glass-panel chart-container">
-                <canvas id="trendChart"></canvas>
-            </div>
-            <div class="glass-panel chart-container">
-                <canvas id="energyChart"></canvas>
-            </div>
-        </div>
-    </section>
-
-    <section id="ai-advisor">
-        <h2 class="section-title"><span class="gradient-text">AI Green Optimizer</span></h2>
-        <div class="glass-panel">
-            <div class="chat-container" id="chat-box">
-                <div class="chat-msg">
-                    <div class="chat-avatar"><i class="fas fa-robot"></i></div>
-                    <div class="chat-bubble">
-                        Hello! I'm your AI Eco-Advisor. Based on your recent calculations, I have some optimization suggestions.
-                    </div>
-                </div>
-            </div>
-            <div class="mt-4">
-                <button class="btn-primary" id="generate-ai-btn">
-                    <i class="fas fa-bolt"></i> Generate New Insights
-                </button>
-            </div>
-        </div>
-    </section>
-
-    <section id="report">
-        <h2 class="section-title"><span class="gradient-text">ESG Compliance</span></h2>
-        <div class="report-layout">
-            <div class="glass-panel">
-                <h3>Generate Report</h3>
-                <p class="text-muted mb-4">Export your calculation data for sustainability reporting and compliance.</p>
-                
-                <div class="form-group">
-                    <label>Company Name</label>
-                    <input type="text" class="form-control" id="company-name" placeholder="Acme Corp">
-                </div>
-
-                <div class="d-flex gap-3 mt-4" style="display: flex; gap: 1rem;">
-                    <button class="btn-primary" id="btn-pdf"><i class="fas fa-file-pdf"></i> Download PDF</button>
-                    <button class="btn-primary" id="btn-csv" style="background: var(--glass); border: 1px solid var(--primary);"><i class="fas fa-file-csv"></i> Export CSV</button>
+    <main>
+        <section class="hero" id="hero">
+            <div class="hero-content">
+                <h1 class="hero-title">Sustainable Supply Chains,<br><span class="gradient-text">Powered by AI</span></h1>
+                <p class="hero-subtitle">Optimize your logistics, reduce carbon footprint, and meet ESG goals with our advanced intelligence platform.</p>
+                <div class="hero-ctas">
+                    <button class="btn btn-primary" onclick="document.getElementById('simulator').scrollIntoView({behavior: 'smooth'})">Calculate Footprint</button>
+                    <button class="btn btn-outline" onclick="document.getElementById('dashboard').scrollIntoView({behavior: 'smooth'})">View Dashboard</button>
                 </div>
             </div>
             
-            <div class="report-paper">
-                <div style="border-bottom: 2px solid #1a1a1a; padding-bottom: 1rem; margin-bottom: 1rem;">
-                    <h2>EcoPulse ESG Summary</h2>
-                    <p class="text-muted" id="report-date">Generated on: </p>
+            <div class="feature-cards">
+                <div class="feature-card glass tilt-card">
+                    <div class="card-icon">🧮</div>
+                    <h3>Carbon Calculator</h3>
+                    <p>Accurately measure logistics emissions across all transport modes.</p>
                 </div>
-                <div style="display: flex; justify-content: space-between; margin-bottom: 2rem;">
-                    <div>
-                        <h4>Total Scope 3</h4>
-                        <h2 style="color: #00e676;">12.4t CO₂</h2>
-                    </div>
-                    <div>
-                        <h4>Overall Grade</h4>
-                        <h2 style="color: #00e676;">B+</h2>
-                    </div>
+                <div class="feature-card glass tilt-card">
+                    <div class="card-icon">📊</div>
+                    <h3>Smart Analytics</h3>
+                    <p>Real-time insights and trend analysis for your supply chain.</p>
                 </div>
-                <p><strong>Recommendation:</strong> Shift 20% of air freight to ocean to achieve a 15% reduction in Q3 emissions.</p>
+                <div class="feature-card glass tilt-card">
+                    <div class="card-icon">🤖</div>
+                    <h3>AI Optimizer</h3>
+                    <p>Actionable recommendations to reduce footprint and costs.</p>
+                </div>
             </div>
-        </div>
-    </section>
+            <div class="scroll-indicator">
+                <span>↓</span>
+            </div>
+        </section>
+
+        <section class="simulator" id="simulator">
+            <div class="section-header">
+                <h2>Logistics Simulator</h2>
+                <p>Calculate and compare emissions for your shipments.</p>
+            </div>
+            
+            <div class="simulator-container glass">
+                <div class="route-selectors">
+                    <div class="input-group">
+                        <label>Origin</label>
+                        <select id="origin">
+                            <option value="New York">New York, USA</option>
+                            <option value="London">London, UK</option>
+                            <option value="Shanghai">Shanghai, China</option>
+                            <option value="Rotterdam">Rotterdam, NL</option>
+                            <option value="Dubai">Dubai, UAE</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label>Destination</label>
+                        <select id="destination">
+                            <option value="London">London, UK</option>
+                            <option value="New York">New York, USA</option>
+                            <option value="Shanghai">Shanghai, China</option>
+                            <option value="Rotterdam">Rotterdam, NL</option>
+                            <option value="Dubai">Dubai, UAE</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="mode-selector">
+                    <label>Transport Mode</label>
+                    <div class="mode-cards" id="mode-cards">
+                        <div class="mode-card active" data-mode="air">
+                            <div class="mode-icon">✈️</div>
+                            <span>Air</span>
+                        </div>
+                        <div class="mode-card" data-mode="rail">
+                            <div class="mode-icon">🚂</div>
+                            <span>Rail</span>
+                        </div>
+                        <div class="mode-card" data-mode="truck">
+                            <div class="mode-icon">🚛</div>
+                            <span>Truck</span>
+                        </div>
+                        <div class="mode-card" data-mode="etruck">
+                            <div class="mode-icon">⚡</div>
+                            <span>E-Truck</span>
+                        </div>
+                        <div class="mode-card" data-mode="ship">
+                            <div class="mode-icon">🚢</div>
+                            <span>Ship</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="weight-selector">
+                    <label>Cargo Weight: <span id="weight-val">5</span> tons</label>
+                    <input type="range" id="weight" min="1" max="100" value="5" class="slider">
+                </div>
+
+                <button class="btn btn-primary full-width" id="calculate-btn">Calculate Impact</button>
+
+                <div class="results-container hidden" id="results">
+                    <div class="metrics-grid">
+                        <div class="metric-box">
+                            <div class="metric-label">CO₂ Footprint</div>
+                            <div class="metric-value"><span id="res-co2">0</span> <small>kg</small></div>
+                        </div>
+                        <div class="metric-box">
+                            <div class="metric-label">Energy</div>
+                            <div class="metric-value"><span id="res-energy">0</span> <small>kWh</small></div>
+                        </div>
+                        <div class="metric-box">
+                            <div class="metric-label">Est. Cost</div>
+                            <div class="metric-value"><span id="res-cost">0</span> <small>$</small></div>
+                        </div>
+                        <div class="metric-box rating-box">
+                            <div class="rating-circle" id="eco-rating-circle">
+                                <span id="res-rating">A</span>
+                            </div>
+                            <div class="metric-label">Eco-Rating</div>
+                        </div>
+                    </div>
+
+                    <div class="comparison-table-wrapper">
+                        <h3>Mode Comparison</h3>
+                        <table class="comparison-table">
+                            <thead>
+                                <tr>
+                                    <th>Mode</th>
+                                    <th>CO₂ (kg)</th>
+                                    <th>Energy (kWh)</th>
+                                    <th>Cost ($)</th>
+                                    <th>Rating</th>
+                                </tr>
+                            </thead>
+                            <tbody id="comparison-body">
+                                <!-- Populated by JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="dashboard" id="dashboard">
+            <div class="section-header">
+                <h2>Carbon Analytics Dashboard</h2>
+            </div>
+            
+            <div class="stats-grid">
+                <div class="stat-card glass">
+                    <div class="stat-icon emerald">📉</div>
+                    <div class="stat-info">
+                        <div class="stat-value counter" data-target="12450">0</div>
+                        <div class="stat-label">CO₂ Saved (kg)</div>
+                    </div>
+                </div>
+                <div class="stat-card glass">
+                    <div class="stat-icon teal">📦</div>
+                    <div class="stat-info">
+                        <div class="stat-value counter" data-target="842">0</div>
+                        <div class="stat-label">Optimized Shipments</div>
+                    </div>
+                </div>
+                <div class="stat-card glass">
+                    <div class="stat-icon lime">🗺️</div>
+                    <div class="stat-info">
+                        <div class="stat-value counter" data-target="320">0</div>
+                        <div class="stat-label">Green Routes</div>
+                    </div>
+                </div>
+                <div class="stat-card glass">
+                    <div class="stat-icon amber">💰</div>
+                    <div class="stat-info">
+                        <div class="stat-value counter" data-target="45800">0</div>
+                        <div class="stat-label">Cost Savings ($)</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="charts-grid">
+                <div class="chart-card glass">
+                    <h3>Emissions by Mode</h3>
+                    <div class="chart-wrapper">
+                        <canvas id="barChart"></canvas>
+                    </div>
+                </div>
+                <div class="chart-card glass">
+                    <h3>Energy Sources</h3>
+                    <div class="chart-wrapper">
+                        <canvas id="doughnutChart"></canvas>
+                    </div>
+                </div>
+                <div class="chart-card glass full-span">
+                    <h3>12-Month Carbon Trend</h3>
+                    <div class="chart-wrapper">
+                        <canvas id="lineChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="ai-advisor" id="ai-advisor">
+            <div class="section-header">
+                <h2>AI Green Optimizer</h2>
+            </div>
+            
+            <div class="chat-container glass">
+                <div class="chat-header">
+                    <div class="chat-title"><span class="sparkle">✨</span> AI Green Advisor</div>
+                    <div class="status-indicator">
+                        <span class="pulse-dot"></span> Active
+                    </div>
+                </div>
+                <div class="chat-messages" id="chat-messages">
+                    <!-- Populated by JS -->
+                </div>
+                <div class="chat-actions">
+                    <button class="btn btn-outline" id="generate-ai-btn">Generate New Suggestions</button>
+                </div>
+            </div>
+        </section>
+
+        <section class="reports" id="reports">
+            <div class="section-header">
+                <h2>ESG Reporting</h2>
+            </div>
+            
+            <div class="report-card glass">
+                <div class="report-preview">
+                    <div class="report-header">
+                        <h3>Acme Corp Logistics</h3>
+                        <p class="report-date">Generated: <span id="current-date"></span></p>
+                    </div>
+                    <div class="report-body">
+                        <div class="report-grade">
+                            <span class="grade">A-</span>
+                            <span>Overall ESG Rating</span>
+                        </div>
+                        <div class="report-summary">
+                            <p>Scope 3 Emissions: <strong>2,450 tCO₂e</strong></p>
+                            <p>Renewable Energy Share: <strong>42%</strong></p>
+                        </div>
+                    </div>
+                </div>
+                <div class="report-actions">
+                    <button class="btn btn-primary" id="download-pdf"><span class="icon">📄</span> Download PDF</button>
+                    <button class="btn btn-outline" id="export-csv"><span class="icon">📊</span> Export CSV</button>
+                </div>
+            </div>
+        </section>
+    </main>
 
     <footer>
-        <div class="footer-grid">
+        <div class="footer-top-border"></div>
+        <div class="footer-content">
             <div class="footer-col">
-                <h3 class="nav-brand"><i class="fas fa-leaf"></i> EcoPulse</h3>
-                <p class="text-muted">Democratizing carbon intelligence with AI-powered logistics optimization.</p>
-            </div>
-            <div class="footer-col">
-                <h3>Navigation</h3>
-                <ul>
-                    <li><a href="#simulator">Simulator</a></li>
-                    <li><a href="#dashboard">Dashboard</a></li>
-                    <li><a href="#ai-advisor">AI Advisor</a></li>
-                </ul>
-            </div>
-            <div class="footer-col">
-                <h3>Connect</h3>
-                <div class="social-links">
-                    <a href="#"><i class="fab fa-github"></i></a>
-                    <a href="#"><i class="fab fa-twitter"></i></a>
-                    <a href="#"><i class="fab fa-linkedin"></i></a>
+                <div class="logo">
+                    <span class="leaf-icon">🌱</span>
+                    <span class="logo-text">EcoPulse</span>
                 </div>
+                <p>Empowering sustainable supply chains through AI-driven insights and carbon intelligence.</p>
+            </div>
+            <div class="footer-col">
+                <h4>Navigation</h4>
+                <a href="#simulator">Simulator</a>
+                <a href="#dashboard">Dashboard</a>
+                <a href="#ai-advisor">AI</a>
+                <a href="#reports">Reports</a>
+            </div>
+            <div class="footer-col">
+                <h4>Connect</h4>
+                <a href="#">Twitter</a>
+                <a href="#">LinkedIn</a>
+                <a href="#">GitHub</a>
             </div>
         </div>
         <div class="footer-bottom">
-            &copy; <span id="year"></span> EcoPulse. All rights reserved.
+            <p>Built with 🌱 for a sustainable future</p>
+            <div class="tech-badges">
+                <span>HTML5</span>
+                <span>CSS3</span>
+                <span>JS</span>
+                <span>Chart.js</span>
+            </div>
         </div>
     </footer>
 
-    <div id="back-to-top"><i class="fas fa-arrow-up"></i></div>
     <div id="toast-container"></div>
-
-    <!-- Scripts -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="app.js"></script>
 </body>
 </html>

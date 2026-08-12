@@ -1,360 +1,340 @@
+// Data & Constants
+const EMISSION_FACTORS = {
+    air: { co2: 0.602, energy: 2.1, cost: 5.5, rating: 'F', color: '#ff5252' },
+    truck: { co2: 0.096, energy: 0.4, cost: 1.2, rating: 'D', color: '#ff9800' },
+    rail: { co2: 0.028, energy: 0.1, cost: 0.8, rating: 'B', color: '#4caf50' },
+    ship: { co2: 0.016, energy: 0.05, cost: 0.4, rating: 'A', color: '#00bcd4' },
+    etruck: { co2: 0.025, energy: 0.15, cost: 1.5, rating: 'A+', color: '#00e676' }
+};
+
+const DISTANCES = {
+    'New York-London': 5567,
+    'Shanghai-Rotterdam': 19500,
+    'Dubai-London': 5476,
+    // Add defaults
+    default: 3000
+};
+
+let currentMode = 'air';
+
+// Initialize
 document.addEventListener('DOMContentLoaded', () => {
-    initParticles();
-    initTypewriter();
-    initScrollEffects();
+    initSimulator();
     initCharts();
-    initCalculator();
+    initCounters();
     initAI();
-    initExport();
-    
-    document.getElementById('year').textContent = new Date().getFullYear();
-    document.getElementById('report-date').textContent += new Date().toLocaleDateString();
+    initMisc();
 });
 
-// Particle System
-function initParticles() {
-    const canvas = document.getElementById('particle-canvas');
-    const ctx = canvas.getContext('2d');
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-
-    const particles = [];
-    for(let i=0; i<50; i++){
-        particles.push({
-            x: Math.random() * canvas.width,
-            y: Math.random() * canvas.height,
-            size: Math.random() * 3 + 1,
-            speedY: Math.random() * -1 - 0.5,
-            speedX: Math.random() * 1 - 0.5,
-            opacity: Math.random() * 0.5 + 0.1
-        });
-    }
-
-    function animate() {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        ctx.fillStyle = '#00e676';
-        
-        particles.forEach(p => {
-            p.y += p.speedY;
-            p.x += Math.sin(p.y * 0.01) + p.speedX;
-            if(p.y < 0) {
-                p.y = canvas.height;
-                p.x = Math.random() * canvas.width;
-            }
-            ctx.globalAlpha = p.opacity;
-            ctx.beginPath();
-            ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-            ctx.fill();
-        });
-        requestAnimationFrame(animate);
-    }
-    animate();
+function getDistance(origin, dest) {
+    const key = `${origin}-${dest}`;
+    const reverseKey = `${dest}-${origin}`;
+    return DISTANCES[key] || DISTANCES[reverseKey] || DISTANCES.default;
 }
 
-// Typewriter
-function initTypewriter() {
-    const text = "Track, optimize, and report your carbon footprint.";
-    const el = document.getElementById('typewriter');
-    let i = 0;
-    function type() {
-        if(i < text.length) {
-            el.innerHTML += text.charAt(i);
-            i++;
-            setTimeout(type, 50);
-        }
-    }
-    setTimeout(type, 500);
-}
-
-// Scroll Effects & Intersection Observer
-function initScrollEffects() {
-    const navbar = document.getElementById('navbar');
-    const backToTop = document.getElementById('back-to-top');
-    const sections = document.querySelectorAll('section');
-    const navLinks = document.querySelectorAll('.nav-links a');
-
-    window.addEventListener('scroll', () => {
-        if(window.scrollY > 50) {
-            navbar.classList.add('scrolled');
-            backToTop.classList.add('visible');
-        } else {
-            navbar.classList.remove('scrolled');
-            backToTop.classList.remove('visible');
-        }
-
-        let current = '';
-        sections.forEach(section => {
-            const sectionTop = section.offsetTop;
-            if(scrollY >= sectionTop - 200) current = section.getAttribute('id');
-        });
-
-        navLinks.forEach(a => {
-            a.classList.remove('active');
-            if(a.getAttribute('href').includes(current)) a.classList.add('active');
-        });
-    });
-
-    backToTop.addEventListener('click', () => window.scrollTo({top:0, behavior:'smooth'}));
-
-    const observer = new IntersectionObserver(entries => {
-        entries.forEach(entry => {
-            if(entry.isIntersecting) {
-                entry.target.classList.add('visible');
-                if(entry.target.id === 'dashboard') animateCounters();
-            }
-        });
-    }, { threshold: 0.1 });
-
-    sections.forEach(sec => observer.observe(sec));
-}
-
-// Animated Counters
-let countersAnimated = false;
-function animateCounters() {
-    if(countersAnimated) return;
-    countersAnimated = true;
-    
-    const counters = [
-        { id: 'stat-saved', target: 4520 },
-        { id: 'stat-shipments', target: 128 },
-        { id: 'stat-money', target: 12500 }
-    ];
-
-    counters.forEach(c => {
-        const el = document.getElementById(c.id);
-        let count = 0;
-        const inc = c.target / 100;
-        const interval = setInterval(() => {
-            count += inc;
-            if(count >= c.target) {
-                el.innerText = c.target.toLocaleString();
-                clearInterval(interval);
-            } else {
-                el.innerText = Math.floor(count).toLocaleString();
-            }
-        }, 20);
-    });
-}
-
-// Calculator
-const factors = { air: 0.602, truck: 0.096, ev: 0.025, rail: 0.028, ship: 0.016 };
-let compChart;
-
-function initCalculator() {
+function initSimulator() {
+    const modeCards = document.querySelectorAll('.mode-card');
     const weightSlider = document.getElementById('weight');
     const weightVal = document.getElementById('weight-val');
-    const modeCards = document.querySelectorAll('.mode-card');
-    let currentMode = 'air';
-
-    weightSlider.addEventListener('input', e => weightVal.textContent = e.target.value);
+    const calcBtn = document.getElementById('calculate-btn');
 
     modeCards.forEach(card => {
         card.addEventListener('click', () => {
             modeCards.forEach(c => c.classList.remove('active'));
             card.classList.add('active');
             currentMode = card.dataset.mode;
-            
-            const icons = { air: 'fa-plane', ship: 'fa-ship', rail: 'fa-train', truck: 'fa-truck', ev: 'fa-truck-fast' };
-            const vIcon = document.getElementById('vehicle-icon');
-            vIcon.className = `fas ${icons[currentMode]} route-vehicle`;
         });
     });
 
-    document.getElementById('calc-btn').addEventListener('click', () => {
-        createRipple(event);
-        const distance = 5567; // Mock fixed distance for demo
-        const weight = document.getElementById('weight').value;
-        const co2 = (distance * weight * factors[currentMode]).toFixed(0);
-        
-        // Animate result
-        const totalEl = document.getElementById('total-co2');
-        totalEl.innerHTML = `${co2} <small>kg CO₂</small>`;
-        
-        // Rating
-        const maxCo2 = distance * weight * factors.air;
-        const ratio = co2 / maxCo2;
-        let rating = 'A', color = 'var(--primary)';
-        if(ratio > 0.8) { rating = 'F'; color = 'var(--danger)'; }
-        else if(ratio > 0.5) { rating = 'D'; color = 'var(--danger)'; }
-        else if(ratio > 0.2) { rating = 'C'; color = 'var(--amber)'; }
-        else if(ratio > 0.1) { rating = 'B'; color = 'var(--accent)'; }
-        
-        const circle = document.getElementById('rating-circle');
-        document.getElementById('rating-text').textContent = rating;
-        document.getElementById('rating-text').style.color = color;
-        circle.style.background = `conic-gradient(${color} ${100 - (ratio*100)}%, rgba(255,255,255,0.1) 0%)`;
+    weightSlider.addEventListener('input', (e) => {
+        weightVal.textContent = e.target.value;
+        const percent = ((e.target.value - e.target.min) / (e.target.max - e.target.min)) * 100;
+        e.target.style.background = `linear-gradient(to right, var(--accent-emerald) ${percent}%, rgba(255,255,255,0.1) ${percent}%)`;
+    });
 
-        updateCompChart(distance, weight);
-        showToast('Calculation complete!', 'success');
+    calcBtn.addEventListener('click', calculateImpact);
+}
+
+function calculateImpact() {
+    const origin = document.getElementById('origin').value;
+    const dest = document.getElementById('destination').value;
+    const weight = parseFloat(document.getElementById('weight').value);
+    const distance = getDistance(origin, dest);
+    
+    const resultsContainer = document.getElementById('results');
+    resultsContainer.classList.remove('hidden');
+
+    // Calculate for current mode
+    const factor = EMISSION_FACTORS[currentMode];
+    const tonKm = weight * distance;
+    const co2 = tonKm * factor.co2;
+    const energy = tonKm * factor.energy;
+    const cost = tonKm * factor.cost;
+
+    animateValue('res-co2', 0, co2, 1000);
+    animateValue('res-energy', 0, energy, 1000);
+    animateValue('res-cost', 0, cost, 1000);
+    
+    document.getElementById('res-rating').textContent = factor.rating;
+    
+    // Update circle color
+    let deg = 0;
+    if(factor.rating.includes('A')) deg = 100;
+    else if(factor.rating === 'B') deg = 80;
+    else if(factor.rating === 'C') deg = 60;
+    else if(factor.rating === 'D') deg = 40;
+    else deg = 20;
+
+    const circle = document.getElementById('eco-rating-circle');
+    circle.style.background = `conic-gradient(${factor.color} ${deg * 3.6}deg, rgba(255,255,255,0.1) 0%)`;
+    
+    // Populate comparison table
+    const tbody = document.getElementById('comparison-body');
+    tbody.innerHTML = '';
+    
+    Object.entries(EMISSION_FACTORS).forEach(([mode, f]) => {
+        const mCo2 = tonKm * f.co2;
+        const mEnergy = tonKm * f.energy;
+        const mCost = tonKm * f.cost;
+        
+        const tr = document.createElement('tr');
+        if(mode === currentMode) tr.classList.add('highlight');
+        
+        tr.innerHTML = `
+            <td>${mode.charAt(0).toUpperCase() + mode.slice(1)}</td>
+            <td>${mCo2.toLocaleString(undefined, {maximumFractionDigits:0})}</td>
+            <td>${mEnergy.toLocaleString(undefined, {maximumFractionDigits:0})}</td>
+            <td>$${mCost.toLocaleString(undefined, {maximumFractionDigits:0})}</td>
+            <td style="color:${f.color}; font-weight:bold;">${f.rating}</td>
+        `;
+        tbody.appendChild(tr);
+    });
+
+    // Save to local storage
+    localStorage.setItem('lastCalc', JSON.stringify({origin, dest, weight, mode: currentMode, co2}));
+}
+
+function animateValue(id, start, end, duration) {
+    const obj = document.getElementById(id);
+    let startTimestamp = null;
+    const step = (timestamp) => {
+        if (!startTimestamp) startTimestamp = timestamp;
+        const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+        obj.innerHTML = Math.floor(progress * (end - start) + start).toLocaleString();
+        if (progress < 1) {
+            window.requestAnimationFrame(step);
+        }
+    };
+    window.requestAnimationFrame(step);
+}
+
+function initCounters() {
+    const counters = document.querySelectorAll('.counter');
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if(entry.isIntersecting) {
+                const target = parseInt(entry.target.getAttribute('data-target'));
+                animateValue(entry.target.id || Math.random().toString(), 0, target, 2000);
+                entry.target.innerHTML = target;
+                observer.unobserve(entry.target);
+            }
+        });
+    });
+    counters.forEach(c => {
+        if(!c.id) c.id = 'cnt-' + Math.random().toString(36).substr(2, 9);
+        observer.observe(c);
     });
 }
 
-function updateCompChart(dist, weight) {
-    const ctx = document.getElementById('comparisonChart').getContext('2d');
-    const data = Object.values(factors).map(f => dist * weight * f);
+function initCharts() {
+    Chart.defaults.color = '#7a8599';
+    Chart.defaults.font.family = "'Inter', sans-serif";
     
-    if(compChart) compChart.destroy();
-    
-    compChart = new Chart(ctx, {
+    const barCtx = document.getElementById('barChart').getContext('2d');
+    new Chart(barCtx, {
         type: 'bar',
         data: {
-            labels: ['Air', 'Truck', 'EV', 'Rail', 'Ship'],
+            labels: ['Air', 'Truck', 'Rail', 'Ship', 'E-Truck'],
             datasets: [{
-                label: 'kg CO₂',
-                data: data,
-                backgroundColor: ['#ff5252', '#ffc107', '#00e676', '#00bcd4', '#00bcd4'],
+                label: 'CO₂ Emissions (kg/ton-km)',
+                data: [0.602, 0.096, 0.028, 0.016, 0.025],
+                backgroundColor: ['#ff5252', '#ff9800', '#4caf50', '#00bcd4', '#00e676'],
                 borderRadius: 4
             }]
         },
         options: {
             responsive: true,
+            maintainAspectRatio: false,
             plugins: { legend: { display: false } },
-            scales: { y: { display: false }, x: { grid: { display: false }, ticks: { color: '#fff' } } }
+            scales: { y: { grid: { color: 'rgba(255,255,255,0.05)' } }, x: { grid: { display: false } } }
         }
     });
-}
 
-// Charts
-function initCharts() {
-    Chart.defaults.color = '#fff';
-    Chart.defaults.font.family = 'Inter';
+    const doughnutCtx = document.getElementById('doughnutChart').getContext('2d');
+    new Chart(doughnutCtx, {
+        type: 'doughnut',
+        data: {
+            labels: ['Fossil Fuels', 'Renewables', 'Nuclear'],
+            datasets: [{
+                data: [58, 32, 10],
+                backgroundColor: ['#ff9800', '#00e676', '#00bcd4'],
+                borderWidth: 0,
+                hoverOffset: 10
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            cutout: '70%',
+            plugins: { legend: { position: 'right' } }
+        }
+    });
 
-    new Chart(document.getElementById('trendChart'), {
+    const lineCtx = document.getElementById('lineChart').getContext('2d');
+    const gradient = lineCtx.createLinearGradient(0, 0, 0, 400);
+    gradient.addColorStop(0, 'rgba(0, 230, 118, 0.5)');
+    gradient.addColorStop(1, 'rgba(0, 230, 118, 0)');
+
+    new Chart(lineCtx, {
         type: 'line',
         data: {
-            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
             datasets: [{
-                label: 'Emissions (t)',
-                data: [65, 59, 80, 81, 56, 55],
+                label: 'Total Emissions (tCO₂e)',
+                data: [120, 115, 110, 105, 95, 90, 85, 80, 78, 75, 70, 65],
                 borderColor: '#00e676',
-                backgroundColor: 'rgba(0, 230, 118, 0.2)',
+                backgroundColor: gradient,
                 fill: true,
                 tension: 0.4
             }]
         },
-        options: { responsive: true, maintainAspectRatio: false }
-    });
-
-    new Chart(document.getElementById('energyChart'), {
-        type: 'doughnut',
-        data: {
-            labels: ['Renewable', 'Fossil'],
-            datasets: [{
-                data: [75, 25],
-                backgroundColor: ['#00e676', '#333'],
-                borderWidth: 0
-            }]
-        },
-        options: { responsive: true, maintainAspectRatio: false }
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: { y: { grid: { color: 'rgba(255,255,255,0.05)' } }, x: { grid: { display: false } } }
+        }
     });
 }
 
-// AI Advisor
 function initAI() {
-    document.getElementById('generate-ai-btn').addEventListener('click', function(e) {
-        createRipple(e);
-        const box = document.getElementById('chat-box');
-        
-        // Typing indicator
-        const typingId = 'typing-' + Date.now();
-        box.innerHTML += `
-            <div class="chat-msg" id="${typingId}">
-                <div class="chat-avatar"><i class="fas fa-robot"></i></div>
-                <div class="chat-bubble">...</div>
-            </div>
-        `;
-        box.scrollTop = box.scrollHeight;
+    const msgs = [
+        { title: 'Route Optimization', text: 'Switching Shanghai → Rotterdam from Air to Ship saves 97% CO₂.', savings: '97% CO₂' },
+        { title: 'Electrification', text: 'Upgrade local delivery fleet to E-Trucks to reduce urban emissions.', savings: '74% CO₂' }
+    ];
 
+    const container = document.getElementById('chat-messages');
+    
+    msgs.forEach((msg, i) => {
         setTimeout(() => {
-            document.getElementById(typingId).remove();
-            box.innerHTML += `
-                <div class="chat-msg">
-                    <div class="chat-avatar"><i class="fas fa-robot"></i></div>
-                    <div class="chat-bubble">
-                        Switching your London -> NYC route from Air to Ocean will increase transit time by 12 days but save <strong>4,200 kg CO₂</strong> and reduce costs by 65%.
-                        <div class="ai-actions">
-                            <button class="btn-sm accept" onclick="acceptAI(this)">Accept Change</button>
-                            <button class="btn-sm" onclick="this.parentElement.parentElement.parentElement.remove()">Dismiss</button>
-                        </div>
+            const div = document.createElement('div');
+            div.className = 'ai-message';
+            div.innerHTML = `
+                <div class="ai-avatar">🌱</div>
+                <div class="ai-bubble glass">
+                    <h4>${msg.title} <span class="badge-savings">${msg.savings}</span></h4>
+                    <p>${msg.text}</p>
+                    <div class="ai-actions">
+                        <button class="btn btn-primary" onclick="acceptSuggestion(this)">Accept</button>
+                        <button class="btn btn-outline" onclick="this.parentElement.parentElement.parentElement.remove()">Dismiss</button>
                     </div>
                 </div>
             `;
-            box.scrollTop = box.scrollHeight;
+            container.appendChild(div);
+            container.scrollTop = container.scrollHeight;
+        }, i * 1000);
+    });
+
+    document.getElementById('generate-ai-btn').addEventListener('click', () => {
+        showToast('Analyzing logistics data...');
+        setTimeout(() => {
+            const div = document.createElement('div');
+            div.className = 'ai-message';
+            div.innerHTML = `
+                <div class="ai-avatar">🤖</div>
+                <div class="ai-bubble glass">
+                    <h4>Consolidation <span class="badge-savings">15% Cost</span></h4>
+                    <p>Combine shipments from London to New York to maximize load factor.</p>
+                    <div class="ai-actions">
+                        <button class="btn btn-primary" onclick="acceptSuggestion(this)">Accept</button>
+                        <button class="btn btn-outline" onclick="this.parentElement.parentElement.parentElement.remove()">Dismiss</button>
+                    </div>
+                </div>
+            `;
+            container.appendChild(div);
+            container.scrollTop = container.scrollHeight;
         }, 1500);
     });
 }
 
-window.acceptAI = function(btn) {
-    showToast('Optimization applied successfully!', 'success');
-    btn.parentElement.parentElement.parentElement.remove();
+window.acceptSuggestion = function(btn) {
+    btn.textContent = 'Accepted ✓';
+    btn.classList.remove('btn-primary');
+    btn.classList.add('btn-outline');
+    btn.style.color = 'var(--accent-emerald)';
+    btn.style.borderColor = 'var(--accent-emerald)';
+    btn.disabled = true;
+    showToast('Optimization applied successfully!');
 }
 
-// Utilities
 function showToast(msg) {
     const container = document.getElementById('toast-container');
     const toast = document.createElement('div');
     toast.className = 'toast';
-    toast.innerHTML = `<i class="fas fa-check-circle" style="color: var(--primary)"></i> ${msg}`;
+    toast.innerHTML = `<span style="color:var(--accent-emerald)">✓</span> ${msg}`;
     container.appendChild(toast);
-    setTimeout(() => toast.remove(), 3000);
+    
+    setTimeout(() => {
+        toast.classList.add('hide');
+        setTimeout(() => toast.remove(), 300);
+    }, 3000);
 }
 
-function createRipple(event) {
-    const button = event.currentTarget;
-    const circle = document.createElement('span');
-    const diameter = Math.max(button.clientWidth, button.clientHeight);
-    const radius = diameter / 2;
-    circle.style.width = circle.style.height = `${diameter}px`;
-    circle.style.left = `${event.clientX - button.offsetLeft - radius}px`;
-    circle.style.top = `${event.clientY - button.offsetTop - radius}px`;
-    circle.classList.add('ripple');
-    const ripple = button.querySelector('.ripple');
-    if (ripple) ripple.remove();
-    button.appendChild(circle);
-}
+function initMisc() {
+    document.getElementById('current-date').textContent = new Date().toLocaleDateString();
 
-// Exports
-function initExport() {
-    document.getElementById('btn-pdf').addEventListener('click', () => {
+    // PDF Export
+    document.getElementById('download-pdf').addEventListener('click', () => {
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF();
-        const company = document.getElementById('company-name').value || 'Your Company';
-        
         doc.setFontSize(22);
-        doc.setTextColor(0, 230, 118);
-        doc.text('EcoPulse ESG Report', 20, 20);
-        
-        doc.setFontSize(14);
-        doc.setTextColor(0, 0, 0);
-        doc.text(`Company: ${company}`, 20, 40);
-        doc.text(`Date: ${new Date().toLocaleDateString()}`, 20, 50);
-        
-        doc.text('Emissions Summary:', 20, 70);
-        doc.text('- Total Scope 3: 12.4t CO2', 30, 80);
-        doc.text('- Overall Grade: B+', 30, 90);
-        
-        doc.save('EcoPulse-Report.pdf');
+        doc.text("Acme Corp Logistics - ESG Report", 20, 20);
+        doc.setFontSize(12);
+        doc.text("Generated: " + new Date().toLocaleDateString(), 20, 30);
+        doc.text("Overall Rating: A-", 20, 40);
+        doc.text("Scope 3 Emissions: 2,450 tCO2e", 20, 50);
+        doc.save("ESG_Report.pdf");
         showToast('PDF Downloaded');
     });
 
-    document.getElementById('btn-csv').addEventListener('click', () => {
-        const csv = "Date,Mode,Origin,Destination,Weight,CO2_kg\n2023-10-01,Air,NYC,LDN,5,1245";
+    // CSV Export
+    document.getElementById('export-csv').addEventListener('click', () => {
+        const csv = "Metric,Value\nOverall Rating,A-\nScope 3 Emissions,2450\nRenewable Share,42%";
         const blob = new Blob([csv], { type: 'text/csv' });
         const url = window.URL.createObjectURL(blob);
         const a = document.createElement('a');
-        a.setAttribute('href', url);
-        a.setAttribute('download', 'emissions.csv');
+        a.href = url;
+        a.download = 'data.csv';
         a.click();
         showToast('CSV Exported');
     });
-}
 
-// Keyboard shortcuts
-document.addEventListener('keydown', (e) => {
-    if(e.key.toLowerCase() === 'c' && e.target.tagName !== 'INPUT') {
-        document.getElementById('simulator').scrollIntoView();
-    }
-    if(e.key.toLowerCase() === 'd' && e.target.tagName !== 'INPUT') {
-        document.getElementById('dashboard').scrollIntoView();
-    }
-});
+    // Keyboard shortcuts
+    document.addEventListener('keydown', (e) => {
+        if (e.key.toLowerCase() === 'c' && e.target.tagName !== 'INPUT' && e.target.tagName !== 'SELECT') {
+            document.getElementById('simulator').scrollIntoView({behavior: 'smooth'});
+        }
+    });
+
+    // Scroll Navbar
+    window.addEventListener('scroll', () => {
+        const nav = document.querySelector('.navbar');
+        if (window.scrollY > 50) {
+            nav.style.background = 'rgba(8, 12, 21, 0.9)';
+            nav.style.boxShadow = '0 4px 30px rgba(0, 0, 0, 0.5)';
+        } else {
+            nav.style.background = 'rgba(8, 12, 21, 0.7)';
+            nav.style.boxShadow = 'none';
+        }
+    });
+}

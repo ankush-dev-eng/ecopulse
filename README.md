@@ -11,117 +11,103 @@
 [![jsPDF](https://img.shields.io/badge/jsPDF-EC5252?style=for-the-badge)]()
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)]()
 
-*Track, optimize, and report your supply chain carbon emissions with AI-driven insights and beautiful analytics.*
+*Track, optimize, and report your supply chain carbon emissions with AI-driven insights and stunning analytics.*
+
+[Live Demo](https://ankushcseiot-50.github.io/ecopulse) · [Report Bug](https://github.com/ankushcseiot-50/ecopulse/issues) · [Request Feature](https://github.com/ankushcseiot-50/ecopulse/issues)
 
 ---
 
 </div>
 
+> **GitHub Repo Settings:**
+> - **Description:** `🌿 AI-Powered Sustainable Supply Chain & Carbon Footprint Calculator — Track, optimize & report emissions with AI`
+> - **Topics:** `carbon-footprint` `sustainability` `ai` `hackathon` `supply-chain` `esg` `climate-tech` `chartjs` `jspdf` `glassmorphism` `dark-theme` `javascript` `html5` `css3`
+
 ## 🌍 The Problem
 
-Small and medium businesses face critical sustainability challenges:
-- **Carbon accounting is expensive** — enterprise tools cost thousands per month
-- **Logistics emissions are invisible** — businesses don't know which routes pollute most
-- **No actionable recommendations** — knowing your emissions doesn't tell you how to reduce them
-- **ESG compliance is complex** — generating regulatory reports requires specialized consultants
+- 💰 **Carbon accounting is expensive** — enterprise tools cost thousands/month
+- 👁️ **Logistics emissions are invisible** — businesses don't know which routes pollute most
+- ❌ **No actionable recommendations** — knowing emissions doesn't reduce them
+- 📋 **ESG compliance is complex** — regulatory reports need consultants
 
 ## 💡 Our Solution
 
-EcoPulse democratizes carbon intelligence with an AI-powered web platform that makes sustainability accessible to every business:
+EcoPulse democratizes carbon intelligence:
 
 ### 🚛 Interactive Logistics Simulator
-- Select origin/destination from **10+ global cities**
-- Choose transport mode: ✈️ Air | 🚂 Rail | 🚛 Truck | ⚡ Electric Truck | 🚢 Ship
-- Real-time CO₂ calculation using **industry-standard emission factors**
-- Side-by-side comparison across all transport modes
-- Visual eco-rating system: **A+** (cleanest) → **F** (highest emissions)
+- 10+ global cities, 5 transport modes
+- Real-time CO₂ with industry-standard emission factors
+- Side-by-side mode comparison table
+- Visual eco-rating: **A+** → **F**
 
 ### 📊 Carbon Analytics Dashboard
-- Animated stat counters: CO₂ Saved, Shipments Optimized, Green Routes, Cost Savings
-- **Bar chart**: CO₂ comparison across transport modes
-- **Doughnut chart**: Renewable vs fossil energy breakdown
-- **Line chart**: 12-month carbon trend analysis
+- Animated counters: CO₂ Saved, Shipments, Green Routes, Savings
+- Bar, Doughnut, Line charts with gradient fills
 
 ### 🤖 AI Green Optimizer
-- Intelligent route optimization suggestions
-- Transport mode switch recommendations with % savings
-- Bulk shipping consolidation analysis
-- Accept/dismiss interface for actionable insights
+- Route optimization suggestions with % savings
+- Accept/dismiss actionable insights
+- Toast notifications on actions
 
-### 📋 ESG Compliance Reports
-- **1-click PDF generation** with jsPDF
-- Professional report with company info, metrics, and rating
-- **CSV data export** for regulatory compliance
-- Calculation history tracking
+### 📋 ESG Reports
+- 1-click PDF with jsPDF
+- CSV data export
+- Calculation history
 
-## 🔬 Carbon Calculation Methodology
+## 🔬 Emission Factors
 
-EcoPulse uses internationally recognized emission factors:
-
-| Transport Mode | CO₂ per ton-km | Source |
-|---|---|---|
-| ✈️ Air | 0.602 kg | ICAO Carbon Calculator |
+| Mode | CO₂/ton-km | Source |
+|:--|:--|:--|
+| ✈️ Air | 0.602 kg | ICAO |
 | 🚛 Truck | 0.096 kg | EPA SmartWay |
-| ⚡ Electric Truck | 0.025 kg | EV Life Cycle Analysis |
-| 🚂 Rail | 0.028 kg | UIC Railway Handbook |
-| 🚢 Ship | 0.016 kg | IMO GHG Study |
+| ⚡ E-Truck | 0.025 kg | EV LCA |
+| 🚂 Rail | 0.028 kg | UIC |
+| 🚢 Ship | 0.016 kg | IMO |
 
 ## 🛠️ Tech Stack
 
-| Technology | Purpose |
-|---|---|
-| HTML5 | Semantic structure & accessibility |
-| CSS3 | Glassmorphism, aurora animations, responsive design |
-| JavaScript (ES6+) | Calculator engine, charts, AI advisor |
-| Chart.js | Interactive data visualizations |
-| jsPDF | Client-side PDF report generation |
-| LocalStorage | Calculation history persistence |
+| Tech | Purpose |
+|:--|:--|
+| HTML5 | Semantic structure |
+| CSS3 | Glassmorphism, 3D animations |
+| JavaScript ES6+ | Calculator, charts, AI |
+| Chart.js | Data visualization |
+| jsPDF | PDF report generation |
+| LocalStorage | History persistence |
 
-## 🚀 Getting Started
+## 🚀 Quick Start
 
 ```bash
-# Clone the repository
 git clone https://github.com/ankushcseiot-50/ecopulse.git
-
-# Navigate to the project
 cd ecopulse
-
-# Open in browser (zero build step!)
 open index.html
-# Or use a local server
-npx serve .
+# Or: npx serve .
 ```
 
-## 📸 Screenshots
-
-> Screenshots coming soon! Run the project locally to see the stunning aurora-themed dashboard.
-
-## 🏗️ Project Structure
+## 🏗️ Structure
 
 ```
 ecopulse/
-├── index.html          # Main dashboard interface
-├── styles.css          # Aurora dark theme & glassmorphism
-├── app.js              # Carbon engine, charts, AI optimizer
-├── README.md           # Documentation
-├── LICENSE             # MIT License
-└── .gitignore          # Git ignore rules
+├── index.html      # Dashboard interface
+├── styles.css      # Premium dark theme
+├── app.js          # Carbon engine, charts, AI
+├── README.md       # Documentation
+├── LICENSE         # MIT
+└── .gitignore      # Git rules
 ```
 
 ## 🤝 Contributing
 
-Contributions are welcome! Feel free to submit a Pull Request.
+PRs welcome!
 
 ## 📄 License
 
-MIT License - see [LICENSE](LICENSE) for details.
+MIT — see [LICENSE](LICENSE)
 
 ---
 
 <div align="center">
-
-**Built with 🌱 for a sustainable future**
-
-[⬆ Back to Top](#-ecopulse)
-
+<b>Built with 🌱 for a sustainable future</b>
+<br><br>
+<a href="#-ecopulse">⬆ Back to Top</a>
 </div>
