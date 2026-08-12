@@ -30,9 +30,25 @@
                 <a href="#reports">Reports</a>
             </div>
             <div class="nav-actions">
-                <div class="theme-toggle">🌓</div>
-                <div class="user-avatar"></div>
-                <button class="btn btn-pill">Get Started</button>
+                <div class="theme-toggle" id="notif-bell-btn" title="Notifications">
+                    🔔 <span class="notification-badge" id="notif-badge">2</span>
+                </div>
+                <div class="user-profile-widget" id="user-widget">
+                    <div class="user-avatar" id="user-avatar-btn"></div>
+                    <span class="user-name" id="user-name-display">Guest</span>
+                </div>
+                <button class="btn btn-pill" id="nav-login-btn">Sign In</button>
+            </div>
+
+            <!-- Notifications Drawer Dropdown -->
+            <div class="notifications-drawer hidden" id="notifications-drawer">
+                <div class="drawer-header">
+                    <h4>Logistics Alerts & ESG Updates</h4>
+                    <button class="mark-read-btn" id="mark-read-btn">Mark All Read</button>
+                </div>
+                <div class="drawer-body" id="drawer-body">
+                    <!-- Loaded dynamically -->
+                </div>
             </div>
             <div class="hamburger">
                 <span></span><span></span><span></span>
@@ -333,6 +349,47 @@
             </div>
         </div>
     </footer>
+
+    <!-- Auth Modal (Login / Signup) -->
+    <div class="modal-overlay" id="auth-modal">
+        <div class="modal-card auth-modal-card glass">
+            <div class="modal-header">
+                <h3 id="auth-title">Sign In to EcoPulse</h3>
+                <button class="close-btn" id="close-auth-modal">✕</button>
+            </div>
+            <div class="modal-body">
+                <form id="login-form">
+                    <div class="form-group">
+                        <label for="login-email">Email Address</label>
+                        <input type="email" id="login-email" required placeholder="user@company.com">
+                    </div>
+                    <div class="form-group">
+                        <label for="login-pass">Password</label>
+                        <input type="password" id="login-pass" required placeholder="••••••••">
+                    </div>
+                    <button type="submit" class="btn btn-primary full-width">Login</button>
+                    <p class="auth-toggle-text">New to EcoPulse? <a href="#" id="show-signup-btn">Create Account</a></p>
+                </form>
+
+                <form id="signup-form" class="hidden">
+                    <div class="form-group">
+                        <label for="signup-name">Full Name / Company</label>
+                        <input type="text" id="signup-name" required placeholder="e.g. Tata Logistics">
+                    </div>
+                    <div class="form-group">
+                        <label for="signup-email">Email Address</label>
+                        <input type="email" id="signup-email" required placeholder="user@company.com">
+                    </div>
+                    <div class="form-group">
+                        <label for="signup-pass">Password</label>
+                        <input type="password" id="signup-pass" required placeholder="At least 6 characters">
+                    </div>
+                    <button type="submit" class="btn btn-primary full-width">Create Account</button>
+                    <p class="auth-toggle-text">Already have an account? <a href="#" id="show-login-btn">Sign In</a></p>
+                </form>
+            </div>
+        </div>
+    </div>
 
     <div id="toast-container"></div>
 </body>

@@ -343,4 +343,171 @@ function initMisc() {
             nav.style.boxShadow = 'none';
         }
     });
+
+    // Auth & Notifications Handlers
+    initAuthAndNotifications();
+}
+
+function initAuthAndNotifications() {
+    const API_BASE = window.location.origin.includes('localhost') || window.location.origin.includes('127.0.0.1') ? 'http://localhost:3001' : '';
+    let currentUser = JSON.parse(localStorage.getItem('eco_user')) || null;
+    
+    const notifBellBtn = document.getElementById('notif-bell-btn');
+    const notifDrawer = document.getElementById('notifications-drawer');
+    const drawerBody = document.getElementById('drawer-body');
+    const markReadBtn = document.getElementById('mark-read-btn');
+    
+    const userWidget = document.getElementById('user-widget');
+    const userNameDisplay = document.getElementById('user-name-display');
+    const navLoginBtn = document.getElementById('nav-login-btn');
+    
+    const authModal = document.getElementById('auth-modal');
+    const closeAuthModalBtn = document.getElementById('close-auth-modal');
+    const loginForm = document.getElementById('login-form');
+    const signupForm = document.getElementById('signup-form');
+    const showSignupBtn = document.getElementById('show-signup-btn');
+    const showLoginBtn = document.getElementById('show-login-btn');
+
+    function updateAuthUI() {
+        if (currentUser) {
+            userNameDisplay.textContent = currentUser.name || 'User';
+            navLoginBtn.textContent = 'Sign Out';
+        } else {
+            userNameDisplay.textContent = 'Guest';
+            navLoginBtn.textContent = 'Sign In';
+        }
+    }
+
+    updateAuthUI();
+
+    navLoginBtn.addEventListener('click', () => {
+        if (currentUser) {
+            if (confirm('Do you want to sign out?')) {
+                localStorage.removeItem('eco_user');
+                localStorage.removeItem('eco_token');
+                currentUser = null;
+                updateAuthUI();
+            }
+        } else {
+            authModal.classList.add('active');
+        }
+    });
+
+    closeAuthModalBtn.addEventListener('click', () => authModal.classList.remove('active'));
+
+    showSignupBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        loginForm.classList.add('hidden');
+        signupForm.classList.remove('hidden');
+    });
+
+    showLoginBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        signupForm.classList.add('hidden');
+        loginForm.classList.remove('hidden');
+    });
+
+    loginForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const email = document.getElementById('login-email').value;
+        const password = document.getElementById('login-pass').value;
+
+        try {
+            const res = await fetch(`${API_BASE}/api/auth/login`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, password })
+            });
+            const data = await res.json();
+            if (res.ok) {
+                currentUser = data.user;
+                localStorage.setItem('eco_user', JSON.stringify(currentUser));
+                localStorage.setItem('eco_token', data.token);
+                updateAuthUI();
+                authModal.classList.remove('active');
+                showToast(`Welcome back, ${currentUser.name}!`);
+            } else {
+                showToast(data.error || 'Login failed');
+            }
+        } catch (err) {
+            currentUser = { id: 'usr_local', name: email.split('@')[0], email };
+            localStorage.setItem('eco_user', JSON.stringify(currentUser));
+            updateAuthUI();
+            authModal.classList.remove('active');
+            showToast(`Signed in as ${currentUser.name} (Local Mode)`);
+        }
+    });
+
+    signupForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const name = document.getElementById('signup-name').value;
+        const email = document.getElementById('signup-email').value;
+        const password = document.getElementById('signup-pass').value;
+
+        try {
+            const res = await fetch(`${API_BASE}/api/auth/register`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name, email, password })
+            });
+            const data = await res.json();
+            if (res.ok) {
+                currentUser = data.user;
+                localStorage.setItem('eco_user', JSON.stringify(currentUser));
+                localStorage.setItem('eco_token', data.token);
+                updateAuthUI();
+                authModal.classList.remove('active');
+                showToast(`Account created for ${currentUser.name}`);
+            } else {
+                showToast(data.error || 'Registration failed');
+            }
+        } catch (err) {
+            currentUser = { id: 'usr_local', name, email };
+            localStorage.setItem('eco_user', JSON.stringify(currentUser));
+            updateAuthUI();
+            authModal.classList.remove('active');
+            showToast(`Account created for ${currentUser.name} (Local Mode)`);
+        }
+    });
+
+    notifBellBtn.addEventListener('click', () => {
+        notifDrawer.classList.toggle('hidden');
+        if (!notifDrawer.classList.contains('hidden')) {
+            fetchNotifications();
+        }
+    });
+
+    async function fetchNotifications() {
+        try {
+            const res = await fetch(`${API_BASE}/api/notifications`);
+            const data = await res.json();
+            renderNotifs(data);
+        } catch (err) {
+            renderNotifs([
+                { id: 1, title: 'Corridor Optimization 🇮🇳', message: 'Mumbai → Delhi Dedicated Freight Corridor saves 76% CO₂.', time: '15m ago', read: false },
+                { id: 2, title: 'ESG Compliance Alert', message: 'Scope 3 Annual Emissions report updated for India corridors.', time: '1h ago', read: false }
+            ]);
+        }
+    }
+
+    function renderNotifs(items) {
+        if (!items || items.length === 0) {
+            drawerBody.innerHTML = '<div class="drawer-empty">No alerts</div>';
+            return;
+        }
+        drawerBody.innerHTML = items.map(i => `
+            <div class="drawer-item ${i.read ? 'read' : 'unread'}">
+                <div class="di-title">${i.title}</div>
+                <div class="di-msg">${i.message}</div>
+                <div class="di-time">${i.time}</div>
+            </div>
+        `).join('');
+        document.getElementById('notif-badge').textContent = items.filter(i => !i.read).length;
+    }
+
+    markReadBtn.addEventListener('click', async () => {
+        try { await fetch(`${API_BASE}/api/notifications/read`, { method: 'POST' }); } catch(err){}
+        document.querySelectorAll('.drawer-item').forEach(el => el.classList.replace('unread', 'read'));
+        document.getElementById('notif-badge').textContent = '0';
+    });
 }
