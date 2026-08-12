@@ -8,11 +8,17 @@ const EMISSION_FACTORS = {
 };
 
 const DISTANCES = {
-    'New York-London': 5567,
-    'Shanghai-Rotterdam': 19500,
-    'Dubai-London': 5476,
-    // Add defaults
-    default: 3000
+    'Mumbai-Delhi': 1400,
+    'Mumbai-Bengaluru': 980,
+    'Delhi-Kolkata': 1500,
+    'Chennai-Bengaluru': 350,
+    'Ahmedabad-Mumbai': 530,
+    'Hyderabad-Mumbai': 710,
+    'Kolkata-Chennai': 1660,
+    'Pune-Mumbai': 150,
+    'Surat-Mumbai': 280,
+    'Kochi-Chennai': 690,
+    default: 850
 };
 
 let currentMode = 'air';
@@ -69,11 +75,11 @@ function calculateImpact() {
     const tonKm = weight * distance;
     const co2 = tonKm * factor.co2;
     const energy = tonKm * factor.energy;
-    const cost = tonKm * factor.cost;
+    const costInRupees = tonKm * factor.cost * 80; // convert to INR
 
     animateValue('res-co2', 0, co2, 1000);
     animateValue('res-energy', 0, energy, 1000);
-    animateValue('res-cost', 0, cost, 1000);
+    animateValue('res-cost', 0, costInRupees, 1000);
     
     document.getElementById('res-rating').textContent = factor.rating;
     
@@ -95,7 +101,7 @@ function calculateImpact() {
     Object.entries(EMISSION_FACTORS).forEach(([mode, f]) => {
         const mCo2 = tonKm * f.co2;
         const mEnergy = tonKm * f.energy;
-        const mCost = tonKm * f.cost;
+        const mCost = tonKm * f.cost * 80;
         
         const tr = document.createElement('tr');
         if(mode === currentMode) tr.classList.add('highlight');
@@ -104,7 +110,7 @@ function calculateImpact() {
             <td>${mode.charAt(0).toUpperCase() + mode.slice(1)}</td>
             <td>${mCo2.toLocaleString(undefined, {maximumFractionDigits:0})}</td>
             <td>${mEnergy.toLocaleString(undefined, {maximumFractionDigits:0})}</td>
-            <td>$${mCost.toLocaleString(undefined, {maximumFractionDigits:0})}</td>
+            <td>₹${mCost.toLocaleString(undefined, {maximumFractionDigits:0})}</td>
             <td style="color:${f.color}; font-weight:bold;">${f.rating}</td>
         `;
         tbody.appendChild(tr);
@@ -219,8 +225,8 @@ function initCharts() {
 
 function initAI() {
     const msgs = [
-        { title: 'Route Optimization', text: 'Switching Shanghai → Rotterdam from Air to Ship saves 97% CO₂.', savings: '97% CO₂' },
-        { title: 'Electrification', text: 'Upgrade local delivery fleet to E-Trucks to reduce urban emissions.', savings: '74% CO₂' }
+        { title: 'Corridor Optimization', text: 'Switching Mumbai → Delhi freight from Highway Truck to Indian Railways Dedicated Freight Corridor (DFC) saves 76% CO₂.', savings: '76% CO₂' },
+        { title: 'EV Fleet Transition', text: 'Transition urban last-mile delivery fleet in Bengaluru & Delhi NCR to Electric Cargo EVs.', savings: '68% CO₂' }
     ];
 
     const container = document.getElementById('chat-messages');
@@ -246,15 +252,15 @@ function initAI() {
     });
 
     document.getElementById('generate-ai-btn').addEventListener('click', () => {
-        showToast('Analyzing logistics data...');
+        showToast('Analyzing Indian logistics data...');
         setTimeout(() => {
             const div = document.createElement('div');
             div.className = 'ai-message';
             div.innerHTML = `
                 <div class="ai-avatar">🤖</div>
                 <div class="ai-bubble glass">
-                    <h4>Consolidation <span class="badge-savings">15% Cost</span></h4>
-                    <p>Combine shipments from London to New York to maximize load factor.</p>
+                    <h4>Coastal Shipping Consolidation <span class="badge-savings">22% Cost</span></h4>
+                    <p>Utilize coastal shipping routes from Mundra to Chennai Port to reduce diesel consumption.</p>
                     <div class="ai-actions">
                         <button class="btn btn-primary" onclick="acceptSuggestion(this)">Accept</button>
                         <button class="btn btn-outline" onclick="this.parentElement.parentElement.parentElement.remove()">Dismiss</button>
@@ -298,12 +304,12 @@ function initMisc() {
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF();
         doc.setFontSize(22);
-        doc.text("Acme Corp Logistics - ESG Report", 20, 20);
+        doc.text("Tata Logistics India - ESG Report", 20, 20);
         doc.setFontSize(12);
         doc.text("Generated: " + new Date().toLocaleDateString(), 20, 30);
         doc.text("Overall Rating: A-", 20, 40);
         doc.text("Scope 3 Emissions: 2,450 tCO2e", 20, 50);
-        doc.save("ESG_Report.pdf");
+        doc.save("India_ESG_Report.pdf");
         showToast('PDF Downloaded');
     });
 

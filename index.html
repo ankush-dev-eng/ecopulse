@@ -76,30 +76,40 @@
 
         <section class="simulator" id="simulator">
             <div class="section-header">
-                <h2>Logistics Simulator</h2>
-                <p>Calculate and compare emissions for your shipments.</p>
+                <h2>India Logistics Simulator 🇮🇳</h2>
+                <p>Calculate and compare carbon emissions across Indian freight corridors.</p>
             </div>
             
             <div class="simulator-container glass">
                 <div class="route-selectors">
                     <div class="input-group">
-                        <label>Origin</label>
+                        <label>Origin Hub</label>
                         <select id="origin">
-                            <option value="New York">New York, USA</option>
-                            <option value="London">London, UK</option>
-                            <option value="Shanghai">Shanghai, China</option>
-                            <option value="Rotterdam">Rotterdam, NL</option>
-                            <option value="Dubai">Dubai, UAE</option>
+                            <option value="Mumbai">Mumbai (JNPT Port)</option>
+                            <option value="Delhi">Delhi NCR (ICD Tughlakabad)</option>
+                            <option value="Bengaluru">Bengaluru (Whitefield Hub)</option>
+                            <option value="Chennai">Chennai (Chennai Port)</option>
+                            <option value="Kolkata">Kolkata (Haldia Port)</option>
+                            <option value="Hyderabad">Hyderabad (Patancheru Terminal)</option>
+                            <option value="Ahmedabad">Ahmedabad (Mundra Hub)</option>
+                            <option value="Pune">Pune (Chakan Cargo Center)</option>
+                            <option value="Surat">Surat (Textile Freight)</option>
+                            <option value="Kochi">Kochi (Vallarpadam Hub)</option>
                         </select>
                     </div>
                     <div class="input-group">
-                        <label>Destination</label>
+                        <label>Destination Hub</label>
                         <select id="destination">
-                            <option value="London">London, UK</option>
-                            <option value="New York">New York, USA</option>
-                            <option value="Shanghai">Shanghai, China</option>
-                            <option value="Rotterdam">Rotterdam, NL</option>
-                            <option value="Dubai">Dubai, UAE</option>
+                            <option value="Delhi">Delhi NCR (ICD Tughlakabad)</option>
+                            <option value="Mumbai">Mumbai (JNPT Port)</option>
+                            <option value="Bengaluru">Bengaluru (Whitefield Hub)</option>
+                            <option value="Chennai">Chennai (Chennai Port)</option>
+                            <option value="Kolkata">Kolkata (Haldia Port)</option>
+                            <option value="Hyderabad">Hyderabad (Patancheru Terminal)</option>
+                            <option value="Ahmedabad">Ahmedabad (Mundra Hub)</option>
+                            <option value="Pune">Pune (Chakan Cargo Center)</option>
+                            <option value="Surat">Surat (Textile Freight)</option>
+                            <option value="Kochi">Kochi (Vallarpadam Hub)</option>
                         </select>
                     </div>
                 </div>
@@ -109,23 +119,23 @@
                     <div class="mode-cards" id="mode-cards">
                         <div class="mode-card active" data-mode="air">
                             <div class="mode-icon">✈️</div>
-                            <span>Air</span>
+                            <span>Air Freight</span>
                         </div>
                         <div class="mode-card" data-mode="rail">
                             <div class="mode-icon">🚂</div>
-                            <span>Rail</span>
+                            <span>Indian Railways</span>
                         </div>
                         <div class="mode-card" data-mode="truck">
                             <div class="mode-icon">🚛</div>
-                            <span>Truck</span>
+                            <span>National Highway Truck</span>
                         </div>
                         <div class="mode-card" data-mode="etruck">
                             <div class="mode-icon">⚡</div>
-                            <span>E-Truck</span>
+                            <span>E-Freight Truck</span>
                         </div>
                         <div class="mode-card" data-mode="ship">
                             <div class="mode-icon">🚢</div>
-                            <span>Ship</span>
+                            <span>Coastal Coastal Vessel</span>
                         </div>
                     </div>
                 </div>
@@ -135,7 +145,7 @@
                     <input type="range" id="weight" min="1" max="100" value="5" class="slider">
                 </div>
 
-                <button class="btn btn-primary full-width" id="calculate-btn">Calculate Impact</button>
+                <button class="btn btn-primary full-width" id="calculate-btn">Calculate India Carbon Impact</button>
 
                 <div class="results-container hidden" id="results">
                     <div class="metrics-grid">
@@ -149,7 +159,7 @@
                         </div>
                         <div class="metric-box">
                             <div class="metric-label">Est. Cost</div>
-                            <div class="metric-value"><span id="res-cost">0</span> <small>$</small></div>
+                            <div class="metric-value">₹<span id="res-cost">0</span></div>
                         </div>
                         <div class="metric-box rating-box">
                             <div class="rating-circle" id="eco-rating-circle">
@@ -160,14 +170,14 @@
                     </div>
 
                     <div class="comparison-table-wrapper">
-                        <h3>Mode Comparison</h3>
+                        <h3>Indian Transport Mode Comparison</h3>
                         <table class="comparison-table">
                             <thead>
                                 <tr>
                                     <th>Mode</th>
                                     <th>CO₂ (kg)</th>
                                     <th>Energy (kWh)</th>
-                                    <th>Cost ($)</th>
+                                    <th>Cost (₹)</th>
                                     <th>Rating</th>
                                 </tr>
                             </thead>
@@ -210,8 +220,8 @@
                 <div class="stat-card glass">
                     <div class="stat-icon amber">💰</div>
                     <div class="stat-info">
-                        <div class="stat-value counter" data-target="45800">0</div>
-                        <div class="stat-label">Cost Savings ($)</div>
+                        <div class="stat-value counter" data-target="458000">0</div>
+                        <div class="stat-label">Cost Savings (₹)</div>
                     </div>
                 </div>
             </div>
@@ -267,7 +277,7 @@
             <div class="report-card glass">
                 <div class="report-preview">
                     <div class="report-header">
-                        <h3>Acme Corp Logistics</h3>
+                        <h3>Tata Logistics India</h3>
                         <p class="report-date">Generated: <span id="current-date"></span></p>
                     </div>
                     <div class="report-body">
