@@ -23,7 +23,7 @@ An immersive, WebGL-powered sustainability platform that combines a stunning scr
 - **AI Recommendations** — Gemini-powered actionable sustainability suggestions
 
 ### 🤖 AI Integration
-- **Google Gemini 2.0 Flash** — Analyzes your emission profile and generates tailored recommendations
+- **Google Gemini 3.5 Flash** — Analyzes your emission profile and generates tailored recommendations
 - **Graceful Fallback** — Works fully offline with client-side calculations; AI enhances when backend is available
 
 ## 🛠️ Tech Stack
@@ -33,7 +33,7 @@ An immersive, WebGL-powered sustainability platform that combines a stunning scr
 | **3D Graphics** | Three.js (r0.160), WebGL Shaders (GLSL) |
 | **Frontend** | Vanilla HTML/CSS/JS, Google Fonts |
 | **Backend** | Node.js, Express |
-| **AI** | Google Gemini 2.0 Flash API |
+| **AI** | Google Gemini 3.5 Flash API |
 | **Architecture** | Single-page app, zero build step |
 
 ## 🚀 Quick Start
