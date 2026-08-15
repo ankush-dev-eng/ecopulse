@@ -61,7 +61,8 @@ app.post('/api/analyze', async (req, res) => {
             });
         }
 
-        const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
+        // Use gemini-3.5-flash as it is the current supported model
+        const model = genAI.getGenerativeModel({ model: 'gemini-3.5-flash' });
 
         const prompt = `As an environmental sustainability expert, analyze these carbon emissions and provide specific, actionable recommendations:
 
