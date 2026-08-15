@@ -1,849 +1,547 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The Statue of Laocoön</title>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Italiana&family=Outfit:wght@300;400;600&family=Playfair+Display:ital,wght@1,500&display=swap');
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>EcoPulse — Planet Intelligence</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Italiana&family=Outfit:wght@300;400;600&display=swap');
+*{margin:0;padding:0;box-sizing:border-box;user-select:none}
+html,body{width:100%;background:#020806;scrollbar-width:none}
+body{min-height:900vh;font-family:Outfit,sans-serif;color:#fff;overflow-x:hidden;cursor:none}
+::-webkit-scrollbar{display:none}
+#webgl{position:fixed;inset:0;width:100%;height:100%;z-index:1;outline:none}
+.cursor-inner{position:fixed;width:6px;height:6px;border:2px solid #d9ffe8;border-radius:50%;transform:translate(-50%,-50%);pointer-events:none;z-index:9999}
+.cursor-outer{position:fixed;width:40px;height:40px;border:1px solid rgba(134,255,189,.7);border-radius:50%;transform:translate(-50%,-50%);pointer-events:none;z-index:9998}
+.cinematic{position:fixed;inset:0;z-index:10;pointer-events:none;padding:0 60px 40px;display:flex;flex-direction:column;justify-content:space-between}
+.header{display:flex;justify-content:space-between;align-items:center;padding:20px 0;border-bottom:1px solid rgba(176,255,207,.12);pointer-events:auto}
+.brand{font-size:14px;font-weight:600;letter-spacing:5px;text-transform:uppercase}.brand span{color:#6dffae}
+.nav{display:flex;gap:24px}.nav a{color:#dce9e0;text-decoration:none;font-size:10px;text-transform:uppercase;letter-spacing:2px}.nav a:hover{color:#75ffb0}
+.pulse-btn{padding:10px 22px;border:1px solid rgba(117,255,176,.45);color:#9effc5;border-radius:20px;font-size:10px;letter-spacing:1px;text-transform:uppercase}
+.slide{position:absolute;bottom:12%;opacity:0;transform:translateY(40px);filter:blur(10px);transition:opacity .9s,transform .9s,filter .9s}
+.slide.active{opacity:1;transform:none;filter:blur(0)}
+#slide1{left:0;width:100%}#slide1 .title{margin-left:60px}
+#slide1 .descrow{display:flex;width:100%;position:relative}#slide1 .col1{margin-left:60px;width:calc(25vw - 60px)}#slide1 .col2{position:absolute;left:calc(25vw + 40px);width:calc(25vw - 60px)}
+#slide2{left:0;width:100%}#slide2 .title{margin-left:calc(25vw + 40px)}#slide2 .desc{margin-left:calc(50vw + 20px);width:calc(25vw - 60px)}
+#slide3{left:calc(50vw + 20px);width:calc(25vw - 60px)}
+#slide4{left:calc(25% + 40px);max-width:650px}
+.title{font-family:Italiana,serif;font-size:116px;line-height:1;font-weight:400;letter-spacing:2px;margin-bottom:20px;color:#f1fff6}
+.title .char{display:inline-block;opacity:0;transform:translateY(50px);filter:blur(12px);transition:.8s cubic-bezier(.25,1,.5,1)}
+.active .title .char{opacity:1;transform:none;filter:blur(0)}
+.desc{font-size:16px;line-height:1.7;font-weight:300;color:#c3d3c9;letter-spacing:.4px;opacity:0;transform:translateY(30px);transition:.8s;transition-delay:.4s}
+.active .desc{opacity:1;transform:none}
+.gridline-top{position:fixed;top:70px;left:0;right:0;height:1px;background:rgba(180,255,208,.1);z-index:5}
+.gridlines{position:fixed;top:0;left:40px;right:40px;height:100vh;display:flex;justify-content:space-between;z-index:5;pointer-events:none}
+.gridline{width:1px;height:100%;background:rgba(180,255,208,.08);position:relative}.gridline:nth-child(3){margin-top:70px;height:calc(100vh - 70px)}
+.dot{position:absolute;left:50%;transform:translate(-50%,-50%);width:6px;height:6px;border-radius:50%;background:#77ffb0;box-shadow:0 0 8px #42ff91}
+.dashes{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);display:flex;flex-direction:column;gap:12px}.dash{width:2px;height:40px;background:rgba(255,255,255,.14)}.fill{width:100%;height:0;background:#7cffb2}
+.footer{display:flex;justify-content:space-between;font-size:8px;letter-spacing:3px;text-transform:uppercase;color:#718078}
+@media(max-width:800px){.cinematic{padding:0 20px 25px}.nav{display:none}.pulse-btn{padding:8px 12px}.title{font-size:22vw}.slide{bottom:10%}#slide1 .title,#slide2 .title{margin-left:7vw}#slide1 .col1,#slide1 .col2,#slide2 .desc,#slide3{margin-left:7vw;left:7vw;width:72vw;max-width:none;position:relative}.desc{font-size:12px}.footer{font-size:7px}}
 
-        * { margin: 0; padding: 0; box-sizing: border-box; user-select: none; }
+#dashboard{position:fixed;inset:0;z-index:200;background:rgba(2,8,6,.97);opacity:0;visibility:hidden;transform:translateY(30px) scale(.985);transition:opacity .7s,transform .7s,visibility .7s;overflow:auto;cursor:auto}
+#dashboard.open{opacity:1;visibility:visible;transform:none}
+#dashboard *{cursor:auto}
+.dash-shell{min-height:100%;padding:34px 5vw 50px;background:radial-gradient(circle at 70% 10%,rgba(50,255,145,.08),transparent 34%),linear-gradient(120deg,#020705,#06120d 55%,#020604)}
+.dash-top{display:flex;justify-content:space-between;align-items:flex-start;border-bottom:1px solid rgba(150,255,194,.15);padding-bottom:25px}
+.dash-kicker,.mini-label{font-size:9px;letter-spacing:3px;color:#72ffae;text-transform:uppercase}
+.dash-top h2{font-family:Italiana,serif;font-size:64px;font-weight:400;margin-top:5px}.dash-top h2 span{color:#72ffae}
+.close-dash{background:transparent;border:1px solid rgba(170,255,201,.3);color:#dfffea;padding:12px 18px;font-size:9px;letter-spacing:2px}
+.dash-grid{display:grid;grid-template-columns:220px 1fr;gap:30px;padding-top:30px}
+.dash-nav{border-right:1px solid rgba(150,255,194,.12);padding-right:22px}.dash-nav-title{font-size:8px;color:#6f7e76;letter-spacing:3px;margin-bottom:16px}
+.dash-tab{display:block;width:100%;text-align:left;background:none;border:0;color:#87968d;padding:14px 10px;font:400 12px Outfit}.dash-tab.active{color:#fff;background:rgba(102,255,166,.08);border-left:2px solid #72ffae}
+.dash-panel{max-width:1100px}.panel-head{display:flex;justify-content:space-between;align-items:end}.dash-panel h3{font:400 42px Italiana;margin:6px 0 25px}.status{font-size:8px;letter-spacing:2px;color:#72ffae}
+.input-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.input-grid label{border:1px solid rgba(170,255,205,.12);background:rgba(255,255,255,.025);padding:15px;color:#cbd7d0;font-size:11px}
+.input-grid input{display:block;width:100%;margin:9px 0 5px;background:#07100c;border:1px solid rgba(170,255,205,.15);color:#fff;padding:11px;outline:none;font:400 14px Outfit}
+.input-grid input:focus{border-color:#72ffae}.input-grid small,.scope-card small,.overview-grid small{font-size:9px;color:#718078}
+.results{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:12px;margin-top:12px}
+.score-card,.scope-card{border:1px solid rgba(170,255,205,.13);background:rgba(255,255,255,.025);padding:20px}.big-number{font-size:38px;margin-top:10px}.big-number small{font-size:11px;color:#87968d}.trend{font-size:10px;color:#72ffae;margin-top:8px}
+.scope-card span{display:block;font-size:10px;color:#87968d}.scope-card strong{display:block;font-size:25px;margin:14px 0 3px}
+.bar-wrap{border:1px solid rgba(170,255,205,.13);padding:20px;margin-top:12px}.bar-row{display:grid;grid-template-columns:70px 1fr 45px;gap:12px;align-items:center;font-size:10px;color:#aab8b0;margin:10px 0}.bar-row i{height:7px;background:#0d1d16;display:block}.bar-row b{display:block;height:100%;width:0;background:linear-gradient(90deg,#48d986,#b4ffcf);transition:width .5s}.bar-row em{font-style:normal;text-align:right;color:#72ffae}
+.overview-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.overview-grid>div{border:1px solid rgba(170,255,205,.13);padding:25px}.overview-grid span{font-size:10px;color:#87968d}.overview-grid strong{display:block;font-size:30px;margin:15px 0 3px}.overview-copy{margin-top:20px;max-width:650px;color:#aab8b0;line-height:1.8}
+.recommendations{display:grid;gap:12px}.rec{padding:20px;border:1px solid rgba(170,255,205,.13);background:rgba(255,255,255,.025)}.rec strong{display:block;color:#72ffae;margin-bottom:7px}.rec span{font-size:12px;color:#b9c7bf;line-height:1.7}
+.tab-panel{display:none}.tab-panel.active{display:block}
+@media(max-width:800px){.dash-grid{grid-template-columns:1fr}.dash-nav{border-right:0;border-bottom:1px solid rgba(150,255,194,.12);padding:0 0 10px;display:flex;gap:5px;overflow:auto}.dash-tab{white-space:nowrap}.dash-top h2{font-size:42px}.input-grid,.results,.overview-grid{grid-template-columns:1fr}.panel-head{display:block}.status{margin-bottom:15px}}
 
-        html, body {
-            width: 100%;
-            margin: 0;
-            padding: 0;
-            background-color: #000000;
-            -ms-overflow-style: none;
-            scrollbar-width: none;
-        }
-
-        body {
-            min-height: 900vh;
-            font-family: 'Outfit', sans-serif;
-            color: #ffffff;
-            overflow-x: hidden;
-            cursor: none;
-        }
-
-        * { cursor: none !important; }
-
-        ::-webkit-scrollbar { display: none; width: 0; }
-
-        #webgl {
-            position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            z-index: 1;
-            outline: none;
-        }
-
-        .cursor-inner {
-            position: fixed; top: 0; left: 0;
-            width: 6px; height: 6px;
-            border: 2px solid rgba(255, 255, 255, 1);
-            border-radius: 50%;
-            transform: translate(-50%, -50%);
-            pointer-events: none;
-            z-index: 9999;
-        }
-        .cursor-outer {
-            position: fixed; top: 0; left: 0;
-            width: 40px; height: 40px;
-            border: 1.5px solid rgba(255, 255, 255, 0.7);
-            border-radius: 50%;
-            transform: translate(-50%, -50%);
-            pointer-events: none;
-            z-index: 9998;
-            transition: width 0.3s, height 0.3s, background 0.3s;
-        }
-
-        .cinematic-container {
-            position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            z-index: 10;
-            pointer-events: none;          /* clicks pass through to canvas */
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            padding: 0 60px 40px 60px;
-            box-sizing: border-box;
-        }
-
-        .main-header {
-            display: flex; justify-content: space-between; align-items: center;
-            width: 100%; z-index: 20;
-            pointer-events: auto;
-            padding: 20px 0;
-        }
-        .brand { font-size: 14px; font-weight: 600; letter-spacing: 5px; text-transform: uppercase; }
-        .header-nav { display: flex; align-items: center; gap: 24px; }
-        .nav-link {
-            color: #ffffff; text-decoration: none;
-            font-size: 10px; text-transform: uppercase; letter-spacing: 2px;
-            font-weight: 500; transition: color 0.3s;
-        }
-        .nav-link:hover { color: #ffffff; }
-        .nav-dot { width: 3px; height: 3px; background: rgba(255, 255, 255, 0.2); border-radius: 50%; }
-        .contact-btn {
-            display: inline-flex; align-items: center; gap: 8px;
-            padding: 10px 24px;
-            background: #ffffff; color: #000000;
-            text-decoration: none;
-            font-size: 10px; text-transform: uppercase; letter-spacing: 1px; font-weight: 600;
-            border-radius: 20px;
-            transition: transform 0.3s, background 0.3s;
-        }
-        .btn-circle {
-            display: inline-block; width: 6px; height: 6px;
-            border: 1px solid #000000; border-radius: 50%; background: transparent;
-        }
-        .contact-btn:hover { transform: scale(1.05); background: #f0f0f0; }
-
-        .slide { position: absolute; bottom: 12%; pointer-events: none; }
-
-        #slide-1 { left: 0; width: 100%; }
-        #slide-1 .slide-title { margin-left: 60px; }
-        #slide-1 .desc-row { position: relative; display: flex; width: 100%; }
-        #slide-1 .col-1 {
-            margin-left: 60px;
-            width: calc(25vw - 60px);
-            max-width: calc(25vw - 60px);
-        }
-        #slide-1 .col-2 {
-            position: absolute;
-            left: calc(25vw + 40px);
-            width: calc(25vw - 60px);
-            max-width: calc(25vw - 60px);
-        }
-
-        #slide-2 { left: 0; width: 100%; }
-        #slide-2-img {
-            position: fixed;
-            top: 90px;
-            left: 60px;
-            width: calc(25vw - 60px);
-            aspect-ratio: 1 / 1;
-            overflow: hidden;
-            z-index: 2;
-            pointer-events: none;
-            clip-path: inset(0 0 100% 0);
-            transition: clip-path 1.8s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.8s ease;
-            opacity: 0;
-        }
-        #slide-2-img img {
-            width: 100%; height: 100%;
-            object-fit: cover;
-            transform: scale(1.15);
-            transition: transform 1.8s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-        #slide-2-img.active { clip-path: inset(0 0 0 0); opacity: 1; }
-        #slide-2-img.active img { transform: scale(1); }
-
-        #slide-2 .slide-title { margin-left: calc(25vw + 40px); }
-        #slide-2 .slide-desc {
-            margin-left: calc(50vw + 20px);
-            width: calc(25vw - 60px);
-            max-width: calc(25vw - 60px);
-        }
-
-        #slide-3 {
-            left: calc(50vw + 20px);
-            width: calc(25vw - 60px);
-            max-width: calc(25vw - 60px);
-        }
-        #slide-3 .slide-title { white-space: nowrap; }
-
-        #slide-4 { left: calc(25% + 40px); max-width: 600px; }
-
-        .slide-title {
-            font-family: 'Italiana', serif;
-            font-size: 116px;
-            line-height: 1.0;
-            font-weight: 400;
-            letter-spacing: 2px;
-            margin-bottom: 20px;
-            color: #fff6ed;
-        }
-        .slide-desc {
-            font-size: 16px; line-height: 1.7; font-weight: 300;
-            color: #d1d5db; letter-spacing: 0.5px;
-            opacity: 0;
-            transform: translateY(30px);
-            transition: opacity 0.8s cubic-bezier(0.25, 1, 0.5, 1),
-                        transform 0.8s cubic-bezier(0.25, 1, 0.5, 1);
-            transition-delay: 0.4s;
-        }
-        .slide.active .slide-desc { opacity: 1; transform: translateY(0); }
-
-        .slide-title .char {
-            display: inline-block;
-            opacity: 0;
-            transform: translateY(50px);
-            filter: blur(12px);
-            transition: opacity 0.8s cubic-bezier(0.25, 1, 0.5, 1),
-                        transform 0.8s cubic-bezier(0.25, 1, 0.5, 1),
-                        filter 0.8s cubic-bezier(0.25, 1, 0.5, 1);
-        }
-        .slide.active .slide-title .char { opacity: 1; transform: translateY(0); filter: blur(0); }
-        .slide.active { pointer-events: auto; }
-
-        .story-dashes {
-            position: absolute; top: 50%; left: 50%;
-            transform: translate(-50%, -50%);
-            display: flex; flex-direction: column; gap: 12px;
-        }
-        .story-dash { width: 2px; height: 40px; background: rgba(255, 255, 255, 0.15); border-radius: 2px; }
-        .story-dash-fill { width: 100%; height: 0%; background: #ffffff; border-radius: 2px; }
-
-        .grid-horizontal-line {
-            position: fixed; top: 70px; left: 0; right: 0;
-            width: 100%; height: 1px;
-            background: rgba(255, 255, 255, 0.12);
-            z-index: 5; pointer-events: none;
-        }
-        .grid-lines {
-            position: fixed; top: 0; left: 40px; right: 40px;
-            width: calc(100% - 80px); height: 100vh;
-            display: flex; justify-content: space-between;
-            z-index: 5; pointer-events: none;
-        }
-        .grid-line {
-            position: relative; width: 1px; height: 100%;
-            background: rgba(255, 255, 255, 0.12);
-        }
-        .grid-line:nth-child(3) { margin-top: 70px; height: calc(100vh - 70px); }
-        .grid-dot {
-            position: absolute; left: 50%;
-            transform: translate(-50%, -50%);
-            width: 6px; height: 6px; border-radius: 50%;
-            background: rgba(255, 255, 255, 0.35);
-            box-shadow: 0 0 4px rgba(255, 255, 255, 0.15);
-        }
-    </style>
-    <script type="importmap">
-    {
-      "imports": {
-        "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
-        "three/examples/jsm/loaders/GLTFLoader.js": "https://unpkg.com/three@0.160.0/examples/jsm/loaders/GLTFLoader.js"
-      }
-    }
-    </script>
+/* Performance mode: pause/hide the WebGL scene while dashboard is active. */
+body.dashboard-mode #webgl,
+body.dashboard-mode .gridline-top,
+body.dashboard-mode .gridlines,
+body.dashboard-mode .cursor-inner,
+body.dashboard-mode .cursor-outer,
+body.dashboard-mode .hint {
+  visibility: hidden;
+}
+body.dashboard-mode .cinematic {
+  opacity: 0;
+  transition: opacity .45s ease;
+}
+body:not(.dashboard-mode) .cinematic {
+  transition: opacity .45s ease;
+}
+#dashboard {
+  will-change: opacity, transform;
+  contain: strict;
+}
+</style>
+<script type="importmap">
+{"imports":{"three":"https://unpkg.com/three@0.160.0/build/three.module.js"}}
+</script>
 </head>
 <body>
-    <div class="cursor-inner"></div>
-    <div class="cursor-outer"></div>
+<div class="cursor-inner"></div><div class="cursor-outer"></div>
+<div class="cinematic">
+<header class="header">
+<div class="brand">Eco<span>Pulse</span></div>
+<nav class="nav">
+<a href="#slide1">Carbon</a><a href="#slide2">Supply Chain</a><a href="#slide3">AI</a><a href="#slide4">Impact</a>
+</nav>
+<button class="pulse-btn" id="launchDashboard">ENTER ECO PULSE ↗</button>
+</header>
 
-    <div class="cinematic-container">
-        <div class="main-header">
-            <div class="brand">Laocoön</div>
-            <nav class="header-nav">
-                <a href="#slide-1" class="nav-link">Bronze</a>
-                <span class="nav-dot"></span>
-                <a href="#slide-2" class="nav-link">Marble</a>
-                <span class="nav-dot"></span>
-                <a href="#slide-3" class="nav-link">Fluid</a>
-                <span class="nav-dot"></span>
-                <a href="#slide-4" class="nav-link">Digital</a>
-            </nav>
-            <div class="header-actions">
-                <a href="#" class="contact-btn">Contact <span class="btn-circle"></span></a>
-            </div>
-        </div>
+<section class="slide" id="slide1">
+<h2 class="title">Carbon <br>in Motion</h2>
+<div class="descrow">
+<p class="desc col1">Every shipment, material and operation leaves a measurable footprint. EcoPulse turns scattered emissions data into one clear picture of where carbon is created.</p>
+<p class="desc col2">From raw materials to final delivery, the platform helps teams calculate, compare and understand their environmental impact before it becomes invisible overhead.</p>
+</div>
+</section>
 
-        <div class="slide" id="slide-1">
-            <h2 class="slide-title">Bronze <br>and Time</h2>
-            <div class="desc-row">
-                <p class="slide-desc col-1">A timeless material holding centuries of human history. Fluid in hot flames, eternal in its form. Each curve captures a tense, dramatic moment.</p>
-                <p class="slide-desc col-2">Born of molten fire and creative will, it stands to bridge our ancient memory and modern vision. A fluid energy frozen in still, heavy bronze.</p>
-            </div>
-        </div>
+<section class="slide" id="slide2">
+<h2 class="title">Smarter <br>Supply Chain</h2>
+<p class="desc">Trace the journey from source to destination. Surface emission hotspots, compare suppliers and identify the changes that can reduce impact without slowing the business.</p>
+</section>
 
-        <div class="slide-image-mask" id="slide-2-img">
-            <img src="https://api.getlayers.ai/storage/v1/object/public/public/assets/laocoon-59f84455c6/1.png" alt="Editorial Concept">
-        </div>
+<section class="slide" id="slide3">
+<h2 class="title">AI <br>for Earth</h2>
+<p class="desc">EcoPulse brings intelligence into sustainability reporting — turning complex operational data into recommendations, forecasts and practical next actions.</p>
+</section>
 
-        <div class="slide" id="slide-2">
-            <h2 class="slide-title">Marble <br>Emotion</h2>
-            <p class="slide-desc">A sculpture frozen at the peak of human suffering and heroic struggle. Laocoön and his sons, bound by ruthless fate.</p>
-        </div>
+<section class="slide" id="slide4">
+<h2 class="title">Measurable <br>Impact</h2>
+<p class="desc">Sustainability becomes a continuous feedback loop: measure the footprint, optimize the system, report the result and move toward a lower-carbon future.</p>
+</section>
 
-        <div class="slide" id="slide-3">
-            <h2 class="slide-title">Liquid Metal</h2>
-            <p class="slide-desc">Art that breathes. Mesmerizing waves of liquid bronze flow through space, reflecting every contour and tensed muscle of the ancient masterpiece.</p>
-        </div>
+<div class="gridline-top"></div>
+<div class="gridlines">
+<div class="gridline"><div class="dot"></div></div>
+<div class="gridline"><div class="dot"></div></div>
+<div class="gridline"><div class="dot"></div></div>
+<div class="gridline"><div class="dot"></div></div>
+<div class="gridline">
+<div class="dot"></div>
+<div class="dashes"><div class="dash"><div class="fill" id="f1"></div></div><div class="dash"><div class="fill" id="f2"></div></div><div class="dash"><div class="fill" id="f3"></div></div><div class="dash"><div class="fill" id="f4"></div></div></div>
+</div>
+</div>
+<div class="footer"><span>EcoPulse — Planet Intelligence</span><span>Scroll / Explore / Optimize</span></div>
+</div>
 
-        <div class="slide" id="slide-4">
-            <h2 class="slide-title">Eternal <br>Moment</h2>
-            <p class="slide-desc">Contemplating antique form through the lens of new dimensions. A classic masterpiece reborn in the currents of radiant digital matter.</p>
-        </div>
+
+<div id="dashboard" aria-hidden="true">
+  <div class="dash-shell">
+    <div class="dash-top">
+      <div>
+        <div class="dash-kicker">ECOPULSE / PLANET INTELLIGENCE</div>
+        <h2>Carbon <span>Dashboard</span></h2>
+      </div>
+      <button id="closeDashboard" class="close-dash">← BACK TO EXPERIENCE</button>
     </div>
 
-    <div class="grid-horizontal-line"></div>
-    <div class="grid-lines">
-        <div class="grid-line"><div class="grid-dot top"></div><div class="grid-dot bottom"></div></div>
-        <div class="grid-line"><div class="grid-dot top"></div><div class="grid-dot bottom"></div></div>
-        <div class="grid-line"><div class="grid-dot top"></div><div class="grid-dot bottom"></div></div>
-        <div class="grid-line"><div class="grid-dot top"></div><div class="grid-dot bottom"></div></div>
-        <div class="grid-line story-progress-container">
-            <div class="grid-dot top"></div>
-            <div class="grid-dot bottom"></div>
-            <div class="story-dashes">
-                <div class="story-dash"><div class="story-dash-fill" id="dash-fill-1"></div></div>
-                <div class="story-dash"><div class="story-dash-fill" id="dash-fill-2"></div></div>
-                <div class="story-dash"><div class="story-dash-fill" id="dash-fill-3"></div></div>
-                <div class="story-dash"><div class="story-dash-fill" id="dash-fill-4"></div></div>
+    <div class="dash-grid">
+      <aside class="dash-nav">
+        <div class="dash-nav-title">WORKSPACE</div>
+        <button class="dash-tab active" data-tab="calculator">Carbon Calculator</button>
+        <button class="dash-tab" data-tab="overview">Overview</button>
+        <button class="dash-tab" data-tab="recommendations">AI Recommendations</button>
+      </aside>
+
+      <main class="dash-main">
+        <section class="dash-panel tab-panel active" id="tab-calculator">
+          <div class="panel-head">
+            <div>
+              <div class="mini-label">EMISSIONS INPUT</div>
+              <h3>Build your footprint</h3>
             </div>
-        </div>
+            <div class="status">● LIVE CALCULATION</div>
+          </div>
+
+          <div class="input-grid">
+            <label>Diesel / fuel
+              <input id="fuel" type="number" min="0" value="120" placeholder="litres">
+              <small>litres / month</small>
+            </label>
+            <label>Electricity
+              <input id="electricity" type="number" min="0" value="850" placeholder="kWh">
+              <small>kWh / month</small>
+            </label>
+            <label>Road freight
+              <input id="freight" type="number" min="0" value="3200" placeholder="tonne-km">
+              <small>tonne-km / month</small>
+            </label>
+            <label>Air freight
+              <input id="air" type="number" min="0" value="0" placeholder="tonne-km">
+              <small>tonne-km / month</small>
+            </label>
+            <label>Waste
+              <input id="waste" type="number" min="0" value="180" placeholder="kg">
+              <small>kg / month</small>
+            </label>
+            <label>Recycled share
+              <input id="recycled" type="number" min="0" max="100" value="25" placeholder="%">
+              <small>percentage</small>
+            </label>
+          </div>
+
+          <div class="results">
+            <div class="score-card">
+              <div class="mini-label">TOTAL ESTIMATE</div>
+              <div class="big-number"><span id="total">0</span><small> kg CO₂e / month</small></div>
+              <div class="trend" id="trend">Enter your activity data to calculate.</div>
+            </div>
+            <div class="scope-card"><span>Scope 1</span><strong id="scope1">0</strong><small>kg CO₂e</small></div>
+            <div class="scope-card"><span>Scope 2</span><strong id="scope2">0</strong><small>kg CO₂e</small></div>
+            <div class="scope-card"><span>Scope 3</span><strong id="scope3">0</strong><small>kg CO₂e</small></div>
+          </div>
+
+          <div class="bar-wrap">
+            <div class="bar-row"><span>Scope 1</span><i><b id="bar1"></b></i><em id="pct1">0%</em></div>
+            <div class="bar-row"><span>Scope 2</span><i><b id="bar2"></b></i><em id="pct2">0%</em></div>
+            <div class="bar-row"><span>Scope 3</span><i><b id="bar3"></b></i><em id="pct3">0%</em></div>
+          </div>
+        </section>
+
+        <section class="dash-panel tab-panel" id="tab-overview">
+          <div class="mini-label">EXECUTIVE VIEW</div>
+          <h3>Turn emissions into decisions.</h3>
+          <div class="overview-grid">
+            <div><span>Carbon intensity</span><strong id="overviewTotal">—</strong><small>kg CO₂e / month</small></div>
+            <div><span>Largest source</span><strong id="largestSource">—</strong><small>scope contribution</small></div>
+            <div><span>Reduction opportunity</span><strong id="opportunity">—</strong><small>estimated first target</small></div>
+          </div>
+          <div class="overview-copy">EcoPulse connects operational activity with a clear emissions picture so teams can identify hotspots before they become invisible costs.</div>
+        </section>
+
+        <section class="dash-panel tab-panel" id="tab-recommendations">
+          <div class="mini-label">AI-READY ACTION LAYER</div>
+          <h3>Priority recommendations</h3>
+          <div id="recommendations" class="recommendations"></div>
+        </section>
+      </main>
     </div>
-
-    <canvas id="webgl"></canvas>
-
-    <script type="module">
-        import * as THREE from 'three';
-        import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
-
-        const ASSET_BASE_URL = "https://api.getlayers.ai/storage/v1/object/public/public/assets/laocoon-59f84455c6";
-
-        const canvas = document.querySelector('#webgl');
-        let scene, camera, renderer;
-        let gltfModel;     // the statue
-        let modelPivot;    // pivot group for perfect center-rotation
-        let mixer;
-        const clock = new THREE.Clock();
-        let currentScroll = 0;   // smoothed accumulated scroll for lerping
-
-        let mouseX = 0, mouseY = 0, targetMouseX = 0, targetMouseY = 0;
-
-        let cursorX = window.innerWidth / 2,  cursorY = window.innerHeight / 2;
-        let outerCursorX = window.innerWidth / 2, outerCursorY = window.innerHeight / 2;
-
-        let bgMaterial;
-        const shaderUniforms = {
-            uTime: { value: 0 },
-            uResolution: { value: new THREE.Vector2(window.innerWidth, window.innerHeight) },
-            uMouse: { value: new THREE.Vector2(0, 0) },
-            uScroll: { value: 0 }
-        };
-
-        let sparkParticles;
-        const sparkCount = 450;
-        const sparkData = [];
-
-        const sizes = { width: window.innerWidth, height: window.innerHeight };
-
-        function createSparkTexture() {
-            const canvas = document.createElement('canvas');
-            canvas.width = 16; canvas.height = 16;
-            const ctx = canvas.getContext('2d');
-            const gradient = ctx.createRadialGradient(8, 8, 0, 8, 8, 8);
-            gradient.addColorStop(0, 'rgba(255, 255, 255, 1)');
-            gradient.addColorStop(0.25, 'rgba(255, 255, 255, 0.85)');
-            gradient.addColorStop(0.6, 'rgba(255, 255, 255, 0.3)');
-            gradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
-            ctx.fillStyle = gradient;
-            ctx.fillRect(0, 0, 16, 16);
-            return new THREE.CanvasTexture(canvas);
-        }
-
-        function createSparks() {
-            const geometry = new THREE.BufferGeometry();
-            const positions = new Float32Array(sparkCount * 3);
-            const colors = new Float32Array(sparkCount * 3);
-
-            for (let i = 0; i < sparkCount; i++) {
-                const x = (Math.random() - 0.5) * 6.5;
-                const y = (Math.random() - 0.5) * 5.0 - 0.5;
-                const z = (Math.random() - 0.5) * 6.5;
-                positions[i * 3] = x;
-                positions[i * 3 + 1] = y;
-                positions[i * 3 + 2] = z;
-
-                if (Math.random() < 0.6) {
-                    // saturated fiery orange
-                    colors[i * 3] = 1.0;
-                    colors[i * 3 + 1] = 0.4 + Math.random() * 0.15;
-                    colors[i * 3 + 2] = 0.05 + Math.random() * 0.1;
-                } else {
-                    // cosmic icy light-blue (matches rim light)
-                    colors[i * 3] = 0.55 + Math.random() * 0.15;
-                    colors[i * 3 + 1] = 0.82 + Math.random() * 0.12;
-                    colors[i * 3 + 2] = 1.0;
-                }
-
-                sparkData.push({
-                    speedX: (Math.random() - 0.5) * 0.4,
-                    speedY: 0.15 + Math.random() * 0.3,
-                    speedZ: (Math.random() - 0.5) * 0.4,
-                    swaySpeed: 0.5 + Math.random() * 1.5,
-                    swayRadius: 0.05 + Math.random() * 0.15,
-                    phase: Math.random() * Math.PI * 2
-                });
-            }
-
-            geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-            geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
-
-            const material = new THREE.PointsMaterial({
-                size: 0.025,
-                vertexColors: true,
-                transparent: true,
-                opacity: 0.85,
-                blending: THREE.AdditiveBlending,
-                depthWrite: false,
-                map: createSparkTexture()
-            });
-
-            sparkParticles = new THREE.Points(geometry, material);
-            scene.add(sparkParticles);
-        }
-
-        function createBackgroundShader() {
-            const vertexShader = `
-                varying vec2 vUv;
-                void main() {
-                    vUv = uv;
-                    gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-                }
-            `;
-
-            const fragmentShader = `
-                varying vec2 vUv;
-                uniform float uTime;
-                uniform vec2 uResolution;
-                uniform vec2 uMouse;
-                uniform float uScroll;
-
-                // 3D Noise function for organic warping (high performance hash-based noise)
-                float hash(float n) { return fract(sin(n) * 43758.5453123); }
-                float noise(in vec3 x) {
-                    vec3 p = floor(x);
-                    vec3 f = fract(x);
-                    f = f*f*(3.0-2.0*f);
-                    float n = p.x + p.y*57.0 + 113.0*p.z;
-                    return mix(mix(mix(hash(n+  0.0), hash(n+  1.0), f.x),
-                                   mix(hash(n+ 57.0), hash(n+ 58.0), f.x), f.y),
-                               mix(mix(hash(n+113.0), hash(n+114.0), f.x),
-                                   mix(hash(n+170.0), hash(n+171.0), f.x), f.y), f.z);
-                }
-
-                void main() {
-                    // Normalize UV coordinates
-                    vec2 uv = (gl_FragCoord.xy - 0.5 * uResolution.xy) / uResolution.y;
-                    float aspect = uResolution.x / uResolution.y;
-                    
-                    float time = uTime * 0.08; // Extremely slow, calm breathing speed
-                    float scroll = uScroll;
-                    
-                    // --- 1. Constant Wave Parameters (Perfect Scroll Stability) ---
-                    // Keep frequencies and angles constant to prevent compressing/speeding waves on scroll
-                    float angle1 = 0.6;
-                    float angle2 = -0.7;
-                    float angle3 = 1.2;
-                    
-                    float freq1 = 2.4;  // Higher frequency = significantly more lines on screen
-                    float freq2 = 3.2;
-                    float freq3 = 4.0;
-                    
-                    // --- 2. Coordinates Distortion (Smooth Rounded Arcs & Scroll Deformation) ---
-                    vec2 warpedUv = uv;
-                    
-                    // Scroll directly drives the deformation of the wave shapes!
-                    // As you scroll, the phase of the distortion shifts, smoothly bending the rounded lines.
-                    float scrollDeform = scroll * 5.0; // 5 radians of smooth sweeping deformation
-                    
-                    // Large scale, perfectly smooth sine-wave distortions for clean, even, rounded arcs
-                    warpedUv.x += sin(uv.y * 2.5 + time * 0.2 + scrollDeform) * 0.35;
-                    warpedUv.y += cos(uv.x * 2.5 - time * 0.15 - scrollDeform * 0.8) * 0.35;
-                    
-                    // Secondary clean curve to create elegant, topographical intersections
-                    warpedUv.x += sin(uv.y * 1.2 - time * 0.1 - scrollDeform * 1.5) * 0.25;
-                    warpedUv.y += cos(uv.x * 1.2 + time * 0.18 + scrollDeform * 1.2) * 0.25;
-                    
-                    // Soft global sliding shift based on scroll parallax and mouse movement
-                    // Keep drift multipliers tiny so scroll motion remains extremely gentle
-                    vec2 scrollDrift = vec2(scroll * 0.04, -scroll * 0.02);
-                    vec2 mouseShift = vec2(uMouse.x * aspect * 0.05, uMouse.y * 0.05);
-                    warpedUv += scrollDrift + mouseShift;
-                    
-                    // --- 3. Layered Wave Computations ---
-                    // Wave directions
-                    vec2 dir1 = vec2(cos(angle1), sin(angle1));
-                    vec2 dir2 = vec2(cos(angle2), sin(angle2));
-                    vec2 dir3 = vec2(cos(angle3), sin(angle3));
-                    
-                    // Layered sine wave calculations with self-warping
-                    float w1 = sin(dot(warpedUv, dir1) * freq1 + time * 1.0);
-                    float w2 = cos(dot(warpedUv, dir2) * freq2 - time * 1.4 + w1 * 0.4);
-                    float w3 = sin(dot(warpedUv, dir3) * freq3 + time * 1.8 + w2 * 0.5);
-                    
-                    // Combine layers into a seamless wave scalar field in [-1.0, 1.0]
-                    float waveField = w1 * 0.50 + w2 * 0.35 + w3 * 0.15;
-                    
-                    // --- 4. Crisp Metallic Lustre ---
-                    // Wide satin sheen (gives defined body to the folds without haze)
-                    float wideSheen = pow(max(0.0, 1.0 - abs(waveField - 0.1)), 2.5);
-                    
-                    // Crisp, thicker specular reflection (defined metallic shine, ensuring thickness with more lines)
-                    float crispSpecular = pow(max(0.0, 1.0 - abs(waveField - 0.15)), 8.0);
-                    
-                    // Highlight blend: crisp, defined glowing folds
-                    float crest = wideSheen * 0.5 + crispSpecular * 0.9;
-                    
-                    // --- 5. Scroll-Driven Color Palettes: Pure Bronze to Pure Blue ---
-                    // Top Palette (Scroll = 0.0): Rich Molten Bronze
-                    vec3 c0_shadow = vec3(0.0010, 0.0006, 0.0004); // Deepest bronze shadow
-                    vec3 c0_wave1  = vec3(0.085, 0.040, 0.015);    // Rich copper-bronze
-                    vec3 c0_wave2  = vec3(0.050, 0.022, 0.008);    // Deep bronze body
-                    vec3 c0_crest  = vec3(0.45, 0.30, 0.18);       // Polished bronze/gold sheen
-                    
-                    // Bottom Palette (Scroll = 1.0): Deep Sapphire Blue
-                    vec3 c1_shadow = vec3(0.0004, 0.0006, 0.0012); // Deepest sapphire shadow
-                    vec3 c1_wave1  = vec3(0.015, 0.035, 0.065);    // Rich cobalt/teal blue
-                    vec3 c1_wave2  = vec3(0.008, 0.020, 0.045);    // Deep sapphire body
-                    vec3 c1_crest  = vec3(0.18, 0.35, 0.55);       // Polished blue-steel sheen
-                    
-                    // Interpolate colors smoothly based on scroll progress
-                    float t = smoothstep(0.0, 1.0, scroll);
-                    vec3 colShadow = mix(c0_shadow, c1_shadow, t);
-                    vec3 colWave1  = mix(c0_wave1, c1_wave1, t);
-                    vec3 colWave2  = mix(c0_wave2, c1_wave2, t);
-                    vec3 colCrest  = mix(c0_crest, c1_crest, t);
-                    
-                    // --- 6. Final Composition ---
-                    // Blend wave details and wave bodies with deep shadow background
-                    vec3 color = colShadow;
-                    color = mix(color, colWave2, smoothstep(-0.6, 0.2, waveField));
-                    color = mix(color, colWave1, smoothstep(0.0, 0.8, waveField));
-                    
-                    // Add the soft satinated crest highlights with rich metallic multiplier
-                    color += colCrest * crest * 1.4;
-                    
-                    // Apply a gentle vignette to match cinematic design
-                    float vignette = 1.0 - dot(uv, uv) * 0.12;
-                    color *= vignette;
-                    
-                    gl_FragColor = vec4(color, 1.0);
-                }
-            `;
-
-            bgMaterial = new THREE.ShaderMaterial({
-                vertexShader: vertexShader,
-                fragmentShader: fragmentShader,
-                uniforms: shaderUniforms,
-                depthWrite: false,
-                depthTest: false
-            });
-
-            const bgGeometry = new THREE.PlaneGeometry(30, 30);
-            const bgMesh = new THREE.Mesh(bgGeometry, bgMaterial);
-            bgMesh.position.set(0.0, 0.0, -8.0);   // local camera space, far behind
-            bgMesh.renderOrder = -10;
-            camera.add(bgMesh);                    // attach to camera so it always fills view
-        }
-
-        function loadModel() {
-            const loader = new GLTFLoader();
-            loader.load(
-                ASSET_BASE_URL + '/bronze_horse.glb',
-                (gltf) => {
-                    gltfModel = gltf.scene;
-
-                    modelPivot = new THREE.Group();
-                    scene.add(modelPivot);
-                    modelPivot.add(gltfModel);
-
-                    gltfModel.traverse((child) => {
-                        if (child.isMesh) {
-                            child.castShadow = true;
-                            child.receiveShadow = true;
-                            if (child.material) {
-                                child.material.roughness = 0.42;   // semi-matte, noble highlights
-                                child.material.metalness = 0.92;   // high satin-bronze metallic sheen
-                                child.material.flatShading = false;
-                                if (child.material.map) {
-                                    child.material.map.anisotropy = 16;
-                                }
-                            }
-                        }
-                    });
-
-                    if (gltf.animations && gltf.animations.length > 0) {
-                        mixer = new THREE.AnimationMixer(gltfModel);
-                        gltf.animations.forEach((clip) => { mixer.clipAction(clip).play(); });
-                    }
-
-                    // 1. scale so max dimension = 3.5
-                    const boxInitial = new THREE.Box3().setFromObject(gltfModel);
-                    const sizeInitial = boxInitial.getSize(new THREE.Vector3());
-                    const maxDim = Math.max(sizeInitial.x, sizeInitial.y, sizeInitial.z);
-                    const targetScale = 3.5 / (maxDim > 0.0001 ? maxDim : 1);
-                    gltfModel.scale.setScalar(targetScale);
-
-                    // 2. update world matrix so the box accounts for scale
-                    gltfModel.updateMatrixWorld(true);
-
-                    // 3. exact geometric center of the scaled model
-                    const boxScaled = new THREE.Box3().setFromObject(gltfModel);
-                    const centerScaled = boxScaled.getCenter(new THREE.Vector3());
-
-                    // 4. recenter model so its center sits at the pivot origin
-                    gltfModel.position.sub(centerScaled);
-
-                    // 5. lower the pivot for a grounded stance
-                    modelPivot.position.y = -0.4;
-                },
-                undefined,
-                (error) => { console.error('Error loading bronze horse model:', error); }
-            );
-        }
-
-        function onWindowResize() {
-            sizes.width = window.innerWidth;
-            sizes.height = window.innerHeight;
-            camera.aspect = sizes.width / sizes.height;
-            camera.updateProjectionMatrix();
-            renderer.setSize(sizes.width, sizes.height);
-            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-            if (shaderUniforms) shaderUniforms.uResolution.value.set(sizes.width, sizes.height);
-        }
-
-        function splitTitlesIntoChars() {
-            const titles = document.querySelectorAll('.slide-title');
-            titles.forEach(title => {
-                const text = title.innerHTML;
-                let newHTML = '';
-                let delayCounter = 0;
-                const parts = text.split(/(<br\s*\/?>)/i);
-                parts.forEach(part => {
-                    if (part.toLowerCase().startsWith('<br')) {
-                        newHTML += part;
-                    } else {
-                        for (let i = 0; i < part.length; i++) {
-                            if (part[i] === ' ') {
-                                newHTML += ' ';
-                            } else {
-                                newHTML += `<span class="char" style="transition-delay: ${delayCounter * 0.035}s">${part[i]}</span>`;
-                                delayCounter++;
-                            }
-                        }
-                    }
-                });
-                title.innerHTML = newHTML;
-            });
-        }
-
-        function updateGridDots(scroll) {
-            const dots = document.querySelectorAll('.grid-dot');
-            dots.forEach((dot, i) => {
-                const startY = (i * 17) % 80 + 10;
-                let speed = 90 + (i * 55) % 180;
-                if (i % 2 === 0) speed = -speed;
-                let y = startY + scroll * speed;
-                y = ((y % 100) + 100) % 100;
-                dot.style.top = `${y}%`;
-            });
-        }
-
-        function updateSlides(scroll) {
-            const slide1 = document.getElementById('slide-1');
-            const slide2 = document.getElementById('slide-2');
-            const slide3 = document.getElementById('slide-3');
-            const slide4 = document.getElementById('slide-4');
-
-            for (let i = 1; i <= 4; i++) {
-                const fill = document.getElementById(`dash-fill-${i}`);
-                if (fill) {
-                    const start = (i - 1) * 0.25;
-                    const end = i * 0.25;
-                    let progress = (scroll - start) / (end - start);
-                    progress = Math.max(0, Math.min(1, progress));
-                    fill.style.height = `${progress * 100}%`;
-                }
-            }
-
-            function isActive(val, start, end) { return val >= start && val <= end; }
-
-            if (slide1) slide1.classList.toggle('active', isActive(scroll, -0.10, 0.12));
-            if (slide2) {
-                const active2 = isActive(scroll, 0.28, 0.40);
-                slide2.classList.toggle('active', active2);
-                const slide2Img = document.getElementById('slide-2-img');
-                if (slide2Img) slide2Img.classList.toggle('active', active2);
-            }
-            if (slide3) slide3.classList.toggle('active', isActive(scroll, 0.56, 0.68));
-            if (slide4) slide4.classList.toggle('active', isActive(scroll, 0.84, 1.05));
-        }
-
-        function setupNavigation() {
-            const navLinks = document.querySelectorAll('.nav-link');
-            const targetScrolls = [0.0, 0.34, 0.62, 0.94];
-            navLinks.forEach((link, index) => {
-                link.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
-                    const targetY = maxScroll * targetScrolls[index];
-                    window.scrollTo({ top: targetY, behavior: 'smooth' });
-                });
-            });
-        }
-
-        function animate() {
-            requestAnimationFrame(animate);
-            const deltaTime = clock.getDelta();
-            if (mixer) mixer.update(deltaTime);
-
-            // 1. target scroll [0..1], cross-browser
-            const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
-            const scrollTop = window.scrollY !== undefined ? window.scrollY
-                : (window.pageYOffset !== undefined ? window.pageYOffset : document.documentElement.scrollTop);
-            const targetScroll = maxScroll > 0 ? scrollTop / maxScroll : 0;
-
-            // smooth physical lerp (inertia)
-            currentScroll += (targetScroll - currentScroll) * 0.025;
-
-            // smooth model rotation lerp
-            mouseX += (targetMouseX - mouseX) * 0.05;
-            mouseY += (targetMouseY - mouseY) * 0.05;
-
-            // outer cursor ring lerps toward inner
-            outerCursorX += (cursorX - outerCursorX) * 0.2;
-            outerCursorY += (cursorY - outerCursorY) * 0.2;
-            const cursorOuter = document.querySelector('.cursor-outer');
-            if (cursorOuter) { cursorOuter.style.left = `${outerCursorX}px`; cursorOuter.style.top = `${outerCursorY}px`; }
-
-            // gentle interactive model tilt from mouse
-            if (modelPivot) {
-                modelPivot.rotation.y = mouseX * 0.25;
-                modelPivot.rotation.x = mouseY * 0.15;
-            }
-
-            // 2. sparks physics, accelerated/turbulent on fast scroll
-            if (sparkParticles) {
-                const positions = sparkParticles.geometry.attributes.position.array;
-                const time = clock.getElapsedTime();
-                const scrollVelocity = Math.abs(targetScroll - currentScroll);
-                const speedMultiplier = 1.0 + scrollVelocity * 9.0;
-                const turbulence = scrollVelocity * 0.8;
-
-                for (let i = 0; i < sparkCount; i++) {
-                    const idx = i * 3;
-                    const data = sparkData[i];
-                    positions[idx]     += data.speedX * deltaTime * speedMultiplier;
-                    positions[idx + 1] += data.speedY * deltaTime * speedMultiplier;
-                    positions[idx + 2] += data.speedZ * deltaTime * speedMultiplier;
-
-                    const currentSway = data.swayRadius * (1.0 + turbulence * 4.0);
-                    positions[idx]     += Math.sin(time * data.swaySpeed + data.phase) * currentSway * deltaTime;
-                    positions[idx + 2] += Math.cos(time * data.swaySpeed + data.phase) * currentSway * deltaTime;
-
-                    // recycle when out of bounds
-                    if (positions[idx + 1] > 3.0 || Math.abs(positions[idx]) > 3.5 || Math.abs(positions[idx + 2]) > 3.5) {
-                        positions[idx + 1] = -2.5;
-                        positions[idx]     = (Math.random() - 0.5) * 3.0;
-                        positions[idx + 2] = (Math.random() - 0.5) * 3.0;
-                    }
-                }
-                sparkParticles.geometry.attributes.position.needsUpdate = true;
-            }
-
-            // 3. camera orbits the model 360° driven by scroll
-            const phi = currentScroll * Math.PI * 2.0;
-            const y = 0.35 + Math.sin(currentScroll * Math.PI) * 0.8;
-            const radius = 4.2 - Math.sin(currentScroll * Math.PI) * 0.6;
-            const x = radius * Math.sin(phi);
-            const z = radius * Math.cos(phi);
-
-            // shift the framing left on the first screen to clear room for the text columns
-            let transitionProgress = Math.min(1.0, currentScroll / 0.28);
-            let easeFactor = (Math.cos(transitionProgress * Math.PI) + 1.0) * 0.5; // 1.0 → 0.0
-            const lookAtXOffset = -0.9 * easeFactor;
-            const targetLookAt = new THREE.Vector3(lookAtXOffset, -0.15, 0);
-            const targetPos = new THREE.Vector3(x, y, z);
-            camera.position.lerp(targetPos, 0.025);
-            camera.lookAt(targetLookAt);
-
-            // background shader uniforms
-            if (shaderUniforms) {
-                shaderUniforms.uTime.value = clock.getElapsedTime();
-                shaderUniforms.uMouse.value.set(mouseX, -mouseY);
-                shaderUniforms.uScroll.value = currentScroll;
-            }
-
-            updateSlides(currentScroll);
-            updateGridDots(currentScroll);
-            renderer.render(scene, camera);
-        }
-
-        window.addEventListener('mousemove', (event) => {
-            cursorX = event.clientX;
-            cursorY = event.clientY;
-            const cursorInner = document.querySelector('.cursor-inner');
-            if (cursorInner) { cursorInner.style.left = `${cursorX}px`; cursorInner.style.top = `${cursorY}px`; }
-            targetMouseX = (event.clientX / window.innerWidth) * 2 - 1;
-            targetMouseY = (event.clientY / window.innerHeight) * 2 - 1;
-        });
-
-        window.addEventListener('resize', onWindowResize);
-
-        window.addEventListener('DOMContentLoaded', () => {
-            splitTitlesIntoChars();
-
-            scene = new THREE.Scene();
-            scene.background = new THREE.Color('#000000');
-            scene.fog = new THREE.FogExp2('#000000', 0.01);
-
-            camera = new THREE.PerspectiveCamera(50, sizes.width / sizes.height, 0.1, 100);
-            camera.position.set(0, 0.2, 3.0);
-            scene.add(camera);
-
-            createBackgroundShader();
-
-            renderer = new THREE.WebGLRenderer({
-                canvas: canvas,
-                antialias: true,
-                alpha: false,
-                powerPreference: "high-performance"
-            });
-            renderer.setSize(sizes.width, sizes.height);
-            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-
-            renderer.shadowMap.enabled = true;
-            renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-            renderer.toneMapping = THREE.ACESFilmicToneMapping;
-            renderer.toneMappingExposure = 2.2;
-
-            const ambientLight = new THREE.AmbientLight('#ffffff', 0.1);
-            scene.add(ambientLight);
-
-            const keyLight = new THREE.SpotLight('#ffffff', 18.0);
-            keyLight.position.set(4, 6, 3);
-            keyLight.angle = Math.PI / 4;
-            keyLight.penumbra = 0.9;
-            keyLight.castShadow = true;
-            keyLight.shadow.mapSize.width = 2048;
-            keyLight.shadow.mapSize.height = 2048;
-            keyLight.shadow.camera.near = 1.0;
-            keyLight.shadow.camera.far = 15;
-            keyLight.shadow.bias = -0.001;
-            scene.add(keyLight);
-
-            const rimLight = new THREE.DirectionalLight('#e3f2ff', 10.0);
-            rimLight.position.set(-5, 3, -4);
-            scene.add(rimLight);
-
-            const fillLight = new THREE.DirectionalLight('#fff3e6', 0.8);
-            fillLight.position.set(-2, -4, 2);
-            scene.add(fillLight);
-
-            createSparks();
-            loadModel();
-
-            onWindowResize();
-            animate();
-            setupNavigation();
-        });
-    </script>
+  </div>
+</div>
+
+<canvas id="webgl"></canvas>
+
+<script type="module">
+import * as THREE from 'three';
+
+const canvas=document.querySelector('#webgl');
+const scene=new THREE.Scene();
+const camera=new THREE.PerspectiveCamera(50,innerWidth/innerHeight,.1,100);
+camera.position.set(0,.2,5);
+scene.add(camera);
+
+const renderer=new THREE.WebGLRenderer({canvas,antialias:true,powerPreference:'high-performance'});
+renderer.setSize(innerWidth,innerHeight);
+renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+renderer.toneMapping=THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure=1.8;
+
+scene.add(new THREE.AmbientLight(0x8fffb7,.18));
+const key=new THREE.SpotLight(0xd9ffe7,18,20,Math.PI/4,.85);
+key.position.set(4,6,3);scene.add(key);
+const rim=new THREE.DirectionalLight(0x4bbcff,10);rim.position.set(-5,3,-4);scene.add(rim);
+const warm=new THREE.PointLight(0x8dff9e,3,10);warm.position.set(2,-2,2);scene.add(warm);
+
+/* Central procedural planet: no external 3D asset required. */
+const planet=new THREE.Group();scene.add(planet);
+
+const earth=new THREE.Mesh(
+ new THREE.SphereGeometry(1.42,96,96),
+ new THREE.MeshStandardMaterial({color:0x176f52,metalness:.18,roughness:.72,emissive:0x03150d,emissiveIntensity:.7})
+);
+planet.add(earth);
+
+const atmosphere=new THREE.Mesh(
+ new THREE.SphereGeometry(1.5,64,64),
+ new THREE.MeshBasicMaterial({color:0x55ffac,transparent:true,opacity:.075,side:THREE.BackSide,blending:THREE.AdditiveBlending})
+);
+planet.add(atmosphere);
+
+const wire=new THREE.Mesh(
+ new THREE.SphereGeometry(1.47,32,20),
+ new THREE.MeshBasicMaterial({color:0x68ffb4,wireframe:true,transparent:true,opacity:.18})
+);
+planet.add(wire);
+
+/* Stylized carbon/energy arcs around the planet */
+const arcs=[];
+for(let i=0;i<5;i++){
+ const arc=new THREE.Mesh(
+  new THREE.TorusGeometry(1.8+i*.18,.012,8,160),
+  new THREE.MeshBasicMaterial({color:i%2?0x62cfff:0x7affae,transparent:true,opacity:.38,blending:THREE.AdditiveBlending})
+ );
+ arc.rotation.x=.5+i*.25;arc.rotation.z=i*.7;planet.add(arc);arcs.push(arc);
+}
+
+/* Green/blue environmental particles */
+const count=700,pos=new Float32Array(count*3),colors=new Float32Array(count*3),data=[];
+for(let i=0;i<count;i++){
+ const a=Math.random()*Math.PI*2,r=2+Math.random()*4.5;
+ pos[i*3]=Math.cos(a)*r;pos[i*3+1]=(Math.random()-.5)*5;pos[i*3+2]=Math.sin(a)*r;
+ const green=Math.random()<.72;
+ colors[i*3]=green?.15+.15*Math.random():.15;
+ colors[i*3+1]=green?.65+.35*Math.random():.55+.25*Math.random();
+ colors[i*3+2]=green?.35+.35*Math.random():1;
+ data.push({a,r,s:.15+Math.random()*1.2,p:Math.random()*6.28});
+}
+const pg=new THREE.BufferGeometry();
+pg.setAttribute('position',new THREE.BufferAttribute(pos,3));
+pg.setAttribute('color',new THREE.BufferAttribute(colors,3));
+const particles=new THREE.Points(pg,new THREE.PointsMaterial({size:.02,vertexColors:true,transparent:true,opacity:.8,blending:THREE.AdditiveBlending,depthWrite:false}));
+scene.add(particles);
+
+/* Atmospheric wave shader */
+const uniforms={uTime:{value:0},uScroll:{value:0},uMouse:{value:new THREE.Vector2()},uResolution:{value:new THREE.Vector2(innerWidth,innerHeight)}};
+const bg=new THREE.ShaderMaterial({
+ uniforms,
+ vertexShader:`varying vec2 vUv;void main(){vUv=uv;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0);}`,
+ fragmentShader:`varying vec2 vUv;uniform float uTime;uniform float uScroll;uniform vec2 uMouse;
+ void main(){
+  vec2 p=(vUv-.5); p.x*=1.7;
+  float w=sin(p.x*4.0+uTime*.12+uScroll*4.0)*.5+cos(p.y*5.0-uTime*.08-uScroll*2.0)*.5;
+  float glow=smoothstep(.65,.0,length(p));
+  vec3 night=vec3(.002,.015,.01);
+  vec3 green=vec3(.015,.13,.065);
+  vec3 blue=vec3(.005,.035,.08);
+  vec3 c=mix(night,green,smoothstep(-.5,.8,w)*.7);
+  c=mix(c,blue,uScroll*.55);
+  c+=vec3(.02,.14,.07)*glow*.25;
+  gl_FragColor=vec4(c,1.0);
+ }`,
+ depthWrite:false,depthTest:false
+});
+const bgMesh=new THREE.Mesh(new THREE.PlaneGeometry(30,30),bg);
+bgMesh.position.z=-8;camera.add(bgMesh);
+
+let currentScroll=0,targetMX=0,targetMY=0,mx=0,my=0,cx=innerWidth/2,cy=innerHeight/2,tx=cx,ty=cy;
+addEventListener('mousemove',e=>{
+ targetMX=e.clientX/innerWidth*2-1;targetMY=e.clientY/innerHeight*2-1;tx=e.clientX;ty=e.clientY;
+ document.querySelector('.cursor-inner').style.left=tx+'px';document.querySelector('.cursor-inner').style.top=ty+'px';
+});
+addEventListener('resize',()=>{
+ camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight);
+ uniforms.uResolution.value.set(innerWidth,innerHeight);
+});
+document.querySelectorAll('.nav a').forEach((a,i)=>a.addEventListener('click',e=>{
+ e.preventDefault();const p=[0,.34,.62,.94][i];scrollTo({top:(document.documentElement.scrollHeight-innerHeight)*p,behavior:'smooth'});
+}));
+
+const slides=[1,2,3,4].map(i=>document.querySelector('#slide'+i));
+slides.forEach(s=>{
+ const t=s.querySelector('.title');let n=0;
+ const parts=t.innerHTML.split(/(<br\s*\/?>)/i);let h='';
+ parts.forEach(part=>{
+  if(/^<br/i.test(part))h+=part;
+  else [...part].forEach(ch=>{if(ch===' ')h+=' ';else{h+=`<span class="char" style="transition-delay:${n*.035}s">${ch}</span>`;n++;}});
+ });
+ t.innerHTML=h;
+});
+const fills=[1,2,3,4].map(i=>document.querySelector('#f'+i));
+const dots=document.querySelectorAll('.dot');
+
+function updateSlides(s){
+ const ranges=[[0,.13],[.28,.40],[.56,.68],[.84,1.05]];
+ slides.forEach((el,i)=>el.classList.toggle('active',s>=ranges[i][0]&&s<=ranges[i][1]));
+ fills.forEach((f,i)=>{let x=(s-i*.25)/.25;x=Math.max(0,Math.min(1,x));f.style.height=x*100+'%'});
+ dots.forEach((d,i)=>{let y=((i*17)%80+10)+s*(i%2?130:-100);d.style.top=((y%100)+100)%100+'%'});
+}
+
+function animate(){
+ if(dashboardOpen) { animationFrame=0; return; }
+ animationFrame=requestAnimationFrame(animate);
+ const t=performance.now()*.001;
+ const max=document.documentElement.scrollHeight-innerHeight;
+ const target=max>0?scrollY/max:0;
+ currentScroll+=(target-currentScroll)*.025;
+ mx+=(targetMX-mx)*.05;my+=(targetMY-my)*.05;
+ cx+=(tx-cx)*.2;cy+=(ty-cy)*.2;
+ document.querySelector('.cursor-outer').style.left=cx+'px';document.querySelector('.cursor-outer').style.top=cy+'px';
+
+ planet.rotation.y=t*.06+mx*.15;
+ planet.rotation.x=my*.1;
+ earth.rotation.y=t*.08;
+ wire.rotation.y=-t*.1;
+ atmosphere.rotation.y=t*.03;
+
+ arcs.forEach((a,i)=>{a.rotation.z=t*(.05+i*.025)+currentScroll*Math.PI*(i+1)*.12});
+ const phi=currentScroll*Math.PI*2;
+ const radius=4.4-Math.sin(currentScroll*Math.PI)*.55;
+ camera.position.lerp(new THREE.Vector3(Math.sin(phi)*radius,.3+Math.sin(currentScroll*Math.PI)*.7,Math.cos(phi)*radius),.025);
+ camera.lookAt(0,0,0);
+
+ const arr=pg.attributes.position.array;
+ for(let i=0;i<count;i++){
+  const d=data[i],k=i*3;d.a+=.0018*d.s*(1+currentScroll*8);
+  arr[k]=Math.cos(d.a)*d.r;arr[k+1]+=.002*d.s*(1+currentScroll*8);arr[k+2]=Math.sin(d.a)*d.r;
+  if(arr[k+1]>3)arr[k+1]=-2.5;
+ }
+ pg.attributes.position.needsUpdate=true;
+
+ uniforms.uTime.value=t;uniforms.uScroll.value=currentScroll;uniforms.uMouse.value.set(mx,my);
+ const dawn=Math.max(0,(currentScroll-.7)/.3);
+ scene.background=new THREE.Color().setHSL(.42-dawn*.3,.65,.012+dawn*.025);
+ updateSlides(currentScroll);
+ renderer.render(scene,camera);
+}
+
+/* --- EcoPulse dashboard bridge --- */
+const dash=document.getElementById('dashboard');
+const launch=document.getElementById('launchDashboard');
+const closeDash=document.getElementById('closeDashboard');
+
+let dashboardOpen=false;
+let animationFrame=0;
+
+function enterDashboard(){
+  if(!dash) return;
+  if(dashboardOpen) return;
+  dashboardOpen=true;
+  document.body.classList.add('dashboard-mode');
+  dash.classList.add('open');
+  dash.setAttribute('aria-hidden','false');
+
+  // Stop the render loop: the calculator does not need WebGL frames.
+  if(animationFrame) cancelAnimationFrame(animationFrame);
+  animationFrame=0;
+}
+
+function leaveDashboard(){
+  if(!dash) return;
+  if(!dashboardOpen) return;
+  dashboardOpen=false;
+  dash.classList.remove('open');
+  dash.setAttribute('aria-hidden','true');
+  document.body.classList.remove('dashboard-mode');
+
+  // Resume the cinematic renderer only when the user returns.
+  if(!animationFrame) animationFrame=requestAnimationFrame(animate);
+}
+
+launch?.addEventListener('click',enterDashboard);
+closeDash?.addEventListener('click',leaveDashboard);
+
+dash?.addEventListener('click',e=>{
+  if(e.target===dash) leaveDashboard();
+});
+
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape' && dashboardOpen) leaveDashboard();
+});
+
+document.querySelectorAll('.dash-tab').forEach(btn=>{
+ btn.addEventListener('click',()=>{
+   document.querySelectorAll('.dash-tab').forEach(x=>x.classList.remove('active'));
+   document.querySelectorAll('.tab-panel').forEach(x=>x.classList.remove('active'));
+   btn.classList.add('active');
+   document.getElementById('tab-'+btn.dataset.tab).classList.add('active');
+ });
+});
+
+const inputs=['fuel','electricity','freight','air','waste','recycled'].map(id=>document.getElementById(id));
+const fmt=n=>Math.round(n).toLocaleString();
+
+/* --- AI Recommendation Fetching --- */
+let fetchTimer=null;
+let lastFetchData='';
+
+const fallbackRecs=[
+  {title:'Reduce direct fuel',description:'Review vehicle routes, loading efficiency and fuel-intensive operations first.',impact:'high'},
+  {title:'Optimize electricity',description:'Prioritize renewable electricity and high-consumption equipment for Scope 2 reductions.',impact:'medium'},
+  {title:'Rethink freight',description:'Compare road and air freight choices and consolidate loads where operationally possible.',impact:'medium'},
+  {title:'Increase circularity',description:'Raising the recycled share can reduce the waste-related portion of the estimate.',impact:'low'}
+];
+
+function renderRecs(recs, aiPowered){
+  const badge=aiPowered?'<span style="display:inline-block;padding:3px 8px;background:rgba(114,255,174,.15);color:#72ffae;font-size:8px;letter-spacing:1px;border:1px solid rgba(114,255,174,.3);margin-left:8px;vertical-align:middle">✦ AI POWERED</span>':'';
+  const heading=document.querySelector('#tab-recommendations h3');
+  if(heading) heading.innerHTML='Priority recommendations'+badge;
+  document.getElementById('recommendations').innerHTML=recs.map(r=>{
+    const impactColor=r.impact==='high'?'#ff6b6b':r.impact==='medium'?'#ffd93d':'#6bcb77';
+    const impactBadge=r.impact?`<span style="display:inline-block;padding:2px 6px;font-size:8px;letter-spacing:1px;color:${impactColor};border:1px solid ${impactColor};opacity:.7;margin-left:8px;text-transform:uppercase">${r.impact} impact</span>`:'';
+    const savingsLine=r.savings?`<span style="display:block;margin-top:6px;font-size:10px;color:#72ffae">↓ Est. savings: ${r.savings}</span>`:'';
+    return `<div class="rec"><strong>${r.title}${impactBadge}</strong><span>${r.description}${savingsLine}</span></div>`;
+  }).join('');
+}
+
+async function fetchAIRecommendations(data){
+  const key=JSON.stringify(data);
+  if(key===lastFetchData) return;
+  lastFetchData=key;
+
+  document.getElementById('recommendations').innerHTML='<div class="rec" style="text-align:center;padding:40px"><span style="color:#72ffae;font-size:12px;letter-spacing:2px">● ANALYZING EMISSIONS WITH AI...</span></div>';
+
+  try{
+    const res=await fetch('/api/analyze',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify(data)
+    });
+    if(!res.ok) throw new Error('Server error');
+    const result=await res.json();
+    if(result.recommendations && result.recommendations.length){
+      renderRecs(result.recommendations, result.aiPowered);
+    }else{
+      renderRecs(fallbackRecs, false);
+    }
+  }catch(e){
+    renderRecs(fallbackRecs, false);
+  }
+}
+
+function scheduleAIFetch(data){
+  clearTimeout(fetchTimer);
+  fetchTimer=setTimeout(()=>fetchAIRecommendations(data),600);
+}
+
+function calculateEcoPulse(){
+ const fuel=+document.getElementById('fuel').value||0;
+ const electricity=+document.getElementById('electricity').value||0;
+ const freight=+document.getElementById('freight').value||0;
+ const air=+document.getElementById('air').value||0;
+ const waste=+document.getElementById('waste').value||0;
+ const recycled=Math.min(100,Math.max(0,+document.getElementById('recycled').value||0));
+
+ const s1=fuel*2.68;
+ const s2=electricity*0.70;
+ const s3=freight*0.11+air*0.60+waste*0.50*(1-recycled/100);
+ const total=s1+s2+s3;
+ const vals=[s1,s2,s3];
+ document.getElementById('total').textContent=fmt(total);
+ document.getElementById('scope1').textContent=fmt(s1);
+ document.getElementById('scope2').textContent=fmt(s2);
+ document.getElementById('scope3').textContent=fmt(s3);
+ vals.forEach((v,i)=>{
+   const pct=total?Math.round(v/total*100):0;
+   document.getElementById('bar'+(i+1)).style.width=pct+'%';
+   document.getElementById('pct'+(i+1)).textContent=pct+'%';
+ });
+ const biggest=vals.indexOf(Math.max(...vals))+1;
+ document.getElementById('trend').textContent=total?`Scope ${biggest} is your largest current source.`:'Enter your activity data to calculate.';
+ document.getElementById('overviewTotal').textContent=fmt(total);
+ document.getElementById('largestSource').textContent='Scope '+biggest;
+ document.getElementById('opportunity').textContent=Math.max(1,Math.round(total*.15)).toLocaleString()+' kg';
+
+ /* Debounced AI fetch — tries backend, falls back to static recs */
+ scheduleAIFetch({fuel,electricity,freight,air,waste,recycled});
+}
+inputs.forEach(i=>i?.addEventListener('input',calculateEcoPulse));
+renderRecs(fallbackRecs, false);
+calculateEcoPulse();
+
+// Start only after every module-level state variable has been initialized.
+animationFrame=requestAnimationFrame(animate);
+</script>
 </body>
 </html>

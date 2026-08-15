@@ -1,64 +1,102 @@
-<p align="center">
-  <img src="./gitskins-expressive.svg" alt="Ankush Shahu - GitHub Profile Skin" width="100%" />
-</p>
+# 🌿 EcoPulse — AI-Powered Carbon Footprint Calculator
 
----
+An immersive, WebGL-powered sustainability platform that combines a stunning scroll-driven 3D landing experience with a fully functional carbon footprint calculator and AI-powered recommendations.
 
-# 🗿 Laocoön — Bronze and Time
+![EcoPulse](https://img.shields.io/badge/EcoPulse-Planet%20Intelligence-00c853?style=for-the-badge&logo=leaflet&logoColor=white)
+![Node.js](https://img.shields.io/badge/Node.js-Backend-339933?style=for-the-badge&logo=node.js&logoColor=white)
+![Gemini AI](https://img.shields.io/badge/Gemini%20AI-Powered-4285F4?style=for-the-badge&logo=google&logoColor=white)
 
-> An immersive, scroll-driven WebGL landing page built as a single self-contained HTML file. Rendered on a deep-black stage with a glowing, semi-polished bronze horse sculpture, 360° camera orbit, liquid-bronze wave shader background, forge spark particles, and editorial UI.
+## ✨ Features
 
-[![Three.js](https://img.shields.io/badge/Three.js-r0.160-black?style=for-the-badge&logo=three.js)](https://threejs.org/)
-[![WebGL](https://img.shields.io/badge/WebGL-Shader-red?style=for-the-badge&logo=webgl)](https://developer.mozilla.org/en-US/docs/Web/API/WebGL_API)
-[![HTML5](https://img.shields.io/badge/HTML5-Single--File-orange?style=for-the-badge&logo=html5)](https://developer.mozilla.org/en-US/docs/Web/HTML)
-[![JavaScript](https://img.shields.io/badge/ES_Modules-CDN_Importmap-yellow?style=for-the-badge&logo=javascript)](https://developer.mozilla.org/en-US/docs/Web/JavaScript)
+### 🌍 Immersive Landing Experience
+- **Procedural 3D Planet** — Stylized Earth with atmosphere glow, wireframe overlay, and orbiting energy arcs
+- **Scroll-Driven Camera Orbit** — 360° smooth camera trajectory across a 900vh canvas
+- **Environmental Particle System** — 700 green/blue particles with physics-based movement
+- **Atmospheric Wave Shader** — GLSL shader background with scroll-reactive color migration
+- **Editorial Typography** — Per-letter staggered blur-up reveals with Italiana + Outfit fonts
+- **Custom Dual-Ring Cursor** — Interactive dot + smooth lerping outer ring
 
----
+### 📊 Carbon Dashboard
+- **Live Carbon Calculator** — Real-time Scope 1/2/3 emission calculations
+- **Visual Breakdown** — Animated bar charts showing emission proportions
+- **Executive Overview** — Carbon intensity, largest source, and reduction opportunities
+- **AI Recommendations** — Gemini-powered actionable sustainability suggestions
 
-## ✨ Features & Visual Highlights
-
-- **360° Scroll-Driven Camera Orbit**: Smooth mathematical camera trajectory surrounding the bronze horse sculpture across a `900vh` page canvas.
-- **Custom Liquid-Bronze Wave Shader**: Shader material plane attached to camera space featuring 3D noise-warped waves, metallic crest highlights, and smooth scroll palette migration from molten bronze to deep sapphire blue.
-- **Forge Spark Particles**: 450 point particles with additive blending, procedural radial gradient texture, color split (60% molten orange / 40% icy blue), and scroll-velocity particle physics acceleration.
-- **Chiaroscuro Lighting Rig**: High-intensity SpotKey light with shadow mapping (2048x2048), cool blue directional rim light, and warm cream fill light.
-- **Editorial Typography & Motion**: Heading titles in *Italiana*, body in *Outfit*, per-letter character split with staggered blur-up reveals, clip-path image masks, 5-line vertical grid overlay with drifting dots, and stories-style progress dashes.
-- **Custom Dual-Ring Cursor**: Interactive cursor inner dot and smooth lerping outer ring.
-
----
+### 🤖 AI Integration
+- **Google Gemini 2.0 Flash** — Analyzes your emission profile and generates tailored recommendations
+- **Graceful Fallback** — Works fully offline with client-side calculations; AI enhances when backend is available
 
 ## 🛠️ Tech Stack
 
-- **Graphics & 3D**: Three.js (r0.160 via CDN importmap), `GLTFLoader`, WebGL Shaders (GLSL).
-- **Styling & Layout**: Pure Vanilla CSS, Google Fonts (*Italiana*, *Outfit*, *Playfair Display*).
-- **Architecture**: Zero build step, zero bundler, single self-contained `index.html`.
-
----
-
-## 🔗 Connected Projects & Repositories
-
-| Repository | Description | Status |
-| :--- | :--- | :--- |
-| 🌿 [ecopulse](https://github.com/ankush-dev-eng/ecopulse) | AI-Powered Sustainable Supply Chain & Carbon Footprint Calculator | Public |
-| 🚨 [pulsecheck-ai](https://github.com/ankush-dev-eng/pulsecheck-ai) | AI-Powered Emergency Disaster Response & SOS Resource Hub | Public |
-| 👤 [ankush-dev-eng](https://github.com/ankush-dev-eng/ankush-dev-eng) | Developer Profile & Project Showcase | Public |
-
----
+| Layer | Technology |
+|-------|------------|
+| **3D Graphics** | Three.js (r0.160), WebGL Shaders (GLSL) |
+| **Frontend** | Vanilla HTML/CSS/JS, Google Fonts |
+| **Backend** | Node.js, Express |
+| **AI** | Google Gemini 2.0 Flash API |
+| **Architecture** | Single-page app, zero build step |
 
 ## 🚀 Quick Start
 
-No build tools or `npm install` required! Simply open `index.html` in any WebGL2-compatible modern web browser:
+### Static Mode (No Backend)
+Just open `index.html` in any modern browser — the landing page and carbon calculator work fully offline.
 
 ```bash
 # Clone the repository
 git clone https://github.com/ankush-dev-eng/ecopulse.git
+cd ecopulse
 
-# Open directly in browser
-open index.html # on macOS
-start index.html # on Windows
+# Open directly
+start index.html    # Windows
+open index.html     # macOS
 ```
 
----
+### Full Mode (With AI Backend)
 
-<p align="center">
-  <sub>Designed & Developed with ❤️ by <a href="https://github.com/ankush-dev-eng">Ankush Shahu (@ankush-dev-eng)</a></sub>
-</p>
+```bash
+# Install dependencies
+npm install
+
+# Set your Gemini API key
+# Create a .env file:
+echo GEMINI_API_KEY=your_api_key_here > .env
+
+# Start the server
+npm start
+```
+
+Then visit [http://localhost:3000](http://localhost:3000)
+
+## 📐 Emission Factors
+
+The calculator uses these standard emission factors:
+
+| Source | Factor | Unit |
+|--------|--------|------|
+| Diesel/Fuel | 2.68 | kg CO₂e/litre |
+| Electricity | 0.70 | kg CO₂e/kWh |
+| Road Freight | 0.11 | kg CO₂e/tonne-km |
+| Air Freight | 0.60 | kg CO₂e/tonne-km |
+| Waste | 0.50 | kg CO₂e/kg |
+
+## 📁 Project Structure
+
+```
+ecopulse/
+├── index.html          # Full landing page + dashboard (self-contained)
+├── server.js           # Express backend with Gemini AI integration
+├── package.json        # Node.js dependencies
+├── gemini_demo.js      # Standalone Gemini API demo script
+├── .gitignore          # node_modules, .env
+└── .env                # API keys (not committed)
+```
+
+## 🔗 Connected Projects
+
+- [ecopulse](https://github.com/ankush-dev-eng/ecopulse)
+- [pulsecheck-ai](https://github.com/ankush-dev-eng/pulsecheck-ai)
+- [ankush-dev-eng](https://github.com/ankush-dev-eng/ankush-dev-eng)
+
+## 📄 License
+
+Designed & Developed with ❤️ by [Ankush Shahu (@ankush-dev-eng)](https://github.com/ankush-dev-eng)
